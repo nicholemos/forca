@@ -1,0 +1,116 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden; /* Previne o estouro horizontal */
+}
+
+#forca-container {
+    margin: 20px 0;
+}
+
+#word {
+    font-size: 2em;
+    letter-spacing: 15px;
+    white-space: normal; /* Permite quebras de linha normais */
+    word-wrap: break-word; /* Quebra a linha onde houver necessidade, mas não corta palavras no meio */
+    overflow-wrap: break-word; /* Garante que o texto quebre nos espaços e não extrapole o bloco */
+    text-align: center; /* Centraliza o texto na tela */
+    display: inline-block;
+    max-width: 100%; /* Limita a largura para evitar estouro */
+}
+
+#wrong-letters {
+    margin: 20px 0;
+    color: red;
+}
+
+#letter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+#letter-buttons button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#letter-buttons button:hover {
+    background-color: #0056b3;
+}
+
+#reset-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#reset-button:hover {
+    background-color: #218838;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.box {
+    width: 45%;
+    text-align: center;
+}
+
+#movie-cover {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Adicionando estilo para a imagem de erro */
+#error-image {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+    .box {
+        width: 100%; /* As boxes ocupam 100% da largura em telas menores */
+        margin-bottom: 20px; /* Margem inferior para espaçamento entre as boxes */
+    }
+
+    #word {
+        font-size: 1.5em; /* Reduz o tamanho da fonte para telas menores */
+        letter-spacing: 10px; /* Ajusta o espaçamento das letras */
+    }
+
+    #letter-buttons button {
+        width: 35px; /* Botões um pouco menores */
+        height: 35px;
+        font-size: 1em; /* Tamanho de fonte ajustado */
+    }
+}
