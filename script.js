@@ -28,8 +28,8 @@ async function getRandomMovie() {
             randomMovie = data.results[Math.floor(Math.random() * data.results.length)];
             const movieTitle = randomMovie.title.toUpperCase();
 
-            // Verifica se o título contém apenas caracteres válidos (letras A-Z, K, W, Y e números)
-            if (/^[A-ZKWY0-9\s!?,.:;'"&-]+$/.test(movieTitle)) {
+            // Verifica se o título contém apenas caracteres válidos (letras A-Z, K, W, Y, números, espaços e caracteres especiais)
+            if (/^[A-Z0-9KWY\s!?,.:;'"&-]+$/.test(movieTitle)) {
                 validMovieFound = true;
                 selectedMovieTitle = movieTitle;
                 selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`;
@@ -47,13 +47,15 @@ async function getRandomMovie() {
 }
 
 
+
 function normalizeText(text) {
     return text
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')  // Remove acentos
-        .replace(/[^A-ZKYW]/gi, '')       // Remove caracteres que não sejam letras de A-Z, exceto K, W e Y
-        .toUpperCase();                   // Converte para maiúsculas
+        .replace(/[^A-Z0-9KWY\s!?,.:;'"&-]/gi, '')  // Mantém letras A-Z, K, W, Y, números e caracteres especiais
+        .toUpperCase();  // Converte para maiúsculas
 }
+
 
 
 function displayWord(isGameLost = false) {
@@ -86,21 +88,25 @@ function updateErrorImage() {
 }
 
 function handleLetterInput(letter) {
+    // Normaliza a letra antes de verificar
     const normalizedLetter = normalizeText(letter);
     const sanitizedTitle = normalizeText(selectedMovieTitle);
 
+    // Verifica se a letra ou número já foi usado
     if (correctLetters.includes(normalizedLetter) || wrongLetters.includes(normalizedLetter)) {
-        return; // Ignora se a letra já foi usada
+        return; // Ignora se já foi usado
     }
 
-    if (sanitizedTitle.includes(normalizedLetter)) {
-        correctLetters.push(normalizedLetter);
+    // Verifica se a letra ou número faz parte do título
+    if (sanitizedTitle.includes(normalizedLetter) || selectedMovieTitle.includes(letter)) {
+        correctLetters.push(normalizedLetter); // Adiciona a letra ou número correto
     } else {
-        wrongLetters.push(normalizedLetter);
+        wrongLetters.push(normalizedLetter); // Adiciona à lista de erros
     }
 
     updateGameStatus();
 }
+
 
 function updateGameStatus() {
     displayWord();
@@ -159,11 +165,22 @@ function resetGame() {
 }
 
 window.addEventListener('keydown', (e) => {
-    const letter = e.key.toUpperCase();
-    if (letter.match(/^[A-Z0-9]$/) && isGameActive) {
+    console.log(e); // Log do evento para verificação
+    let letter = e.key.toUpperCase();
+
+    // Captura números do teclado numérico e do teclado padrão
+    if (e.code.startsWith('Numpad')) {
+        letter = e.key; // Para números do teclado numérico
+    }
+
+    // Verifica se a tecla pressionada é uma letra ou número
+    if (/^[A-Z0-9]$/.test(letter) && isGameActive) {
         handleLetterInput(letter);
+    } else {
+        console.log('Tecla inválida:', letter); // Log de tecla inválida para depuração
     }
 });
+
 
 function generateLetterButtons() {
     const letterButtonsContainer = document.getElementById('letter-buttons');
