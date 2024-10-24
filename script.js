@@ -1,5 +1,6 @@
 const apiKey = 'f3853edb736e04c1a9cb685d8a8951d0';
-const apiUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=1`;
+const minPage = 1;
+const maxPage = 300; // Defina o número máximo de páginas
 let selectedMovieTitle;
 let selectedMovieCover;
 let selectedMovieRating;
@@ -7,57 +8,76 @@ let wrongLetters = [];
 let correctLetters = [];
 let isGameActive = true;
 
-// Função para pegar um filme aleatório
 async function getRandomMovie() {
     try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error('Erro na resposta da API');
+        let validMovieFound = false;
+        let randomMovie;
+
+        // Continua procurando até encontrar um título de filme válido
+        while (!validMovieFound) {
+            const randomPage = Math.floor(Math.random() * (maxPage - minPage + 1)) + minPage;
+            const apiUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) throw new Error('Erro na resposta da API');
+
+            const data = await response.json();
+            if (!data.results.length) throw new Error('Nenhum filme encontrado');
+
+            // Escolhe um filme aleatório da lista
+            randomMovie = data.results[Math.floor(Math.random() * data.results.length)];
+            const movieTitle = randomMovie.title.toUpperCase();
+
+            // Verifica se o título contém apenas caracteres válidos (letras A-Z, K, W, Y e números)
+            if (/^[A-ZKWY0-9\s!?,.:;'"&-]+$/.test(movieTitle)) {
+                validMovieFound = true;
+                selectedMovieTitle = movieTitle;
+                selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`;
+                selectedMovieRating = randomMovie.vote_average;
+            }
         }
-        const data = await response.json();
-        if (!data.results || data.results.length === 0) {
-            throw new Error('Nenhum filme encontrado');
-        }
-        const movies = data.results;
-        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-        selectedMovieTitle = randomMovie.title.toUpperCase();
-        selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`;
-        selectedMovieRating = randomMovie.vote_average;
-        correctLetters = [];
-        wrongLetters = [];
-        isGameActive = true;
+
+        // Após encontrar um filme válido, inicializa o jogo
+        resetGame();
         displayWord();
-        updateWrongLetters();
     } catch (error) {
         console.error('Erro ao buscar filme:', error);
         alert('Não foi possível carregar os dados do filme. Por favor, tente novamente mais tarde.');
     }
 }
 
+
 function normalizeText(text) {
     return text
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')  // Remove acentos
+        .replace(/[^A-ZKYW]/gi, '')       // Remove caracteres que não sejam letras de A-Z, exceto K, W e Y
         .toUpperCase();                   // Converte para maiúsculas
 }
 
 
-
-function displayWord() {
+function displayWord(isGameLost = false) {
     const wordElement = document.getElementById('word');
     wordElement.innerHTML = selectedMovieTitle
         .split(' ')
         .map(word => {
             return word.split('').map(letter => {
+                const normalizedLetter = normalizeText(letter);
+
                 if (letter.match(/[!?,.:;'"&-]/)) {
-                    return letter;
+                    return letter; // Mantém os caracteres especiais
+                } else if (correctLetters.includes(normalizedLetter)) {
+                    return `<span>${letter}</span>`; // Letras adivinhadas corretamente
+                } else if (isGameLost) {
+                    return `<span style="color:red">${letter}</span>`; // Letras erradas ficam vermelhas após o fim do jogo
                 } else {
-                    return correctLetters.includes(normalizeText(letter)) ? letter : '_';
+                    return '_'; // Exibe sublinhado se a letra ainda não foi adivinhada
                 }
             }).join('');
         })
         .join(' ');
 }
+
 
 function updateErrorImage() {
     const errorImage = document.getElementById('error-image');
@@ -65,8 +85,6 @@ function updateErrorImage() {
     errorImage.src = `${errorCount}erro.png`;
 }
 
-
-// Função para verificar se o jogador digitou a letra corretamente
 function handleLetterInput(letter) {
     const normalizedLetter = normalizeText(letter);
     const sanitizedTitle = normalizeText(selectedMovieTitle);
@@ -84,7 +102,6 @@ function handleLetterInput(letter) {
     updateGameStatus();
 }
 
-
 function updateGameStatus() {
     displayWord();
     updateWrongLetters();
@@ -101,17 +118,17 @@ function checkEndGame() {
     const allLettersRevealed = selectedMovieTitle.split(' ').every(word => {
         return word.split('').every(letter => {
             const normalizedLetter = normalizeText(letter);
-            // Verifica se a letra foi adivinhada ou se é um caractere especial
             return correctLetters.includes(normalizedLetter) || letter.match(/[!?,.:;'"&-]/);
         });
     });
 
     if (allLettersRevealed) {
-        isGameActive = false; // O jogo termina
+        isGameActive = false; // O jogo termina por vitória
         displayMovieInfo(); // Exibe informações do filme
         setTimeout(() => alert('Parabéns! Você adivinhou o filme!'), 100);
-    } else if (wrongLetters.length >= 6) { // Ajuste o limite de erros
-        isGameActive = false; // O jogo termina
+    } else if (wrongLetters.length >= 6) { // Se o jogador errou 6 vezes
+        isGameActive = false; // O jogo termina por derrota
+        displayWord(true); // Preenche as letras faltantes e destaca em vermelho
         setTimeout(() => alert(`Fim de jogo! O filme era: ${selectedMovieTitle}`), 100);
     }
 }
@@ -129,7 +146,7 @@ function displayMovieInfo() {
 function resetGame() {
     correctLetters = [];
     wrongLetters = [];
-    getRandomMovie();
+    displayWord();
     document.getElementById('wrong-letters-span').innerText = '';
     updateErrorImage();
     const movieCoverElement = document.getElementById('movie-cover');
@@ -164,6 +181,10 @@ function generateLetterButtons() {
     });
 }
 
-getRandomMovie();
+document.getElementById('reset-button').addEventListener('click', () => {
+    resetGame();
+    getRandomMovie(); // Busca um novo filme após o reset
+});
+
 generateLetterButtons();
-document.getElementById('reset-button').addEventListener('click', resetGame);
+getRandomMovie(); // Carrega um filme ao iniciar
