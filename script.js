@@ -28,49 +28,45 @@ async function getRandomItem() {
                 apiUrl = `https://api.themoviedb.org/3/tv/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
             } else if (category === 'pessoas') {
                 apiUrl = `https://api.themoviedb.org/3/person/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
-            } else {
-                // ... (código para 'todos' permanece o mesmo)
             }
 
             // Se a categoria não for "todos", busca somente um tipo
-            if (category !== 'todos') {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Erro na resposta da API');
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('Erro na resposta da API');
 
-                const data = await response.json();
-                if (!data.results.length) throw new Error('Nenhum item encontrado');
+            const data = await response.json();
+            if (!data.results.length) throw new Error('Nenhum item encontrado');
 
-                // Filtra os itens para garantir que os títulos sejam válidos
-                const validItems = data.results.filter(item => {
-                    const title = item.title || item.name;
-                    const normalizedTitle = normalizeText(title); // Normaliza o título
-                    return /^[A-Z0-9\s'.-]+$/u.test(normalizedTitle); // Verifica se o título contém apenas letras e espaços
-                });
+            // Filtra os itens para garantir que os títulos sejam válidos
+            const validItems = data.results.filter(item => {
+                const title = item.title || item.name;
+                const normalizedTitle = normalizeText(title); // Normaliza o título
+                return /^[A-Z0-9\s'.-]+$/u.test(normalizedTitle); // Verifica se o título contém apenas letras e espaços
+            });
 
-                if (validItems.length === 0) throw new Error('Nenhum item válido encontrado');
+            if (validItems.length === 0) throw new Error('Nenhum item válido encontrado');
 
-                randomItem = validItems[Math.floor(Math.random() * validItems.length)];
-                selectedMovieTitle = randomItem.title || randomItem.name;
+            randomItem = validItems[Math.floor(Math.random() * validItems.length)];
+            selectedMovieTitle = randomItem.title || randomItem.name;
 
-                // Verifica se randomItem tem a propriedade correta para a categoria
-                if (category === 'pessoas') {
-                    if (randomItem.profile_path) {
-                        selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.profile_path}`;
-                    } else {
-                        selectedMovieCover = ''; // ou uma imagem padrão, se preferir
-                    }
+            // Verifica se randomItem tem a propriedade correta para a categoria
+            if (category === 'pessoas') {
+                if (randomItem.profile_path) {
+                    selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.profile_path}`;
                 } else {
-                    if (randomItem.poster_path) {
-                        selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.poster_path}`;
-                    } else {
-                        selectedMovieCover = ''; // ou uma imagem padrão, se preferir
-                    }
+                    selectedMovieCover = ''; // ou uma imagem padrão, se preferir
                 }
-
-                selectedMovieRating = randomItem.vote_average;
-
-                validItemFound = true;
+            } else {
+                if (randomItem.poster_path) {
+                    selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.poster_path}`;
+                } else {
+                    selectedMovieCover = ''; // ou uma imagem padrão, se preferir
+                }
             }
+
+            selectedMovieRating = randomItem.vote_average;
+
+            validItemFound = true;
         }
 
         resetGame();
@@ -81,8 +77,6 @@ async function getRandomItem() {
     }
 }
 
-
-
 function normalizeText(text) {
     return text
         .normalize('NFD')
@@ -91,9 +85,6 @@ function normalizeText(text) {
         .replace(/[^A-Z0-9KWY\s!?,.:;'"&-]/gi, '')  // Mantém letras A-Z, K, W, Y, números e caracteres especiais
         .toUpperCase();  // Converte para maiúsculas
 }
-
-
-
 
 function displayWord(isGameLost = false) {
     const wordElement = document.getElementById('word');
