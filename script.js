@@ -13,7 +13,8 @@ document.getElementById('category-select').addEventListener('change', getRandomI
 // Quando o botão de reset for pressionado
 document.getElementById('reset-button').addEventListener('click', () => {
     resetGame(); // Reseta o estado do jogo
-    getRandomItem(); // Recarrega um novo item da API após reset
+    // Remover a linha abaixo para evitar carregar um novo item ao clicar "Recomeçar jogo"
+    // getRandomItem(); // Recarrega um novo item da API após reset
 });
 
 
@@ -34,12 +35,15 @@ function resetGame() {
     selectedMovieTitle = '';
     selectedMovieCover = '';
     selectedMovieRating = '';
+    updateScore(); // Zerando o placar
 }
 
 
 // Função para buscar um item aleatório com base na categoria selecionada
 async function getRandomItem() {
     const category = document.getElementById('category-select').value;
+    if (!category) return; // Verifica se a categoria foi selecionada antes de buscar os dados
+
     try {
         let validItemFound = false;
         let randomItem;
@@ -57,7 +61,6 @@ async function getRandomItem() {
                 apiUrl = `https://api.themoviedb.org/3/person/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
             }
 
-            // Se a categoria não for "todos", busca somente um tipo
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error('Erro na resposta da API');
 
@@ -96,7 +99,7 @@ async function getRandomItem() {
             validItemFound = true;
         }
 
-        resetGame();
+        resetGame(); // Não chamar getRandomItem aqui após reset
         displayWord();
     } catch (error) {
         console.error('Erro ao buscar item:', error);
