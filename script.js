@@ -244,3 +244,40 @@ document.getElementById('reset-button').addEventListener('click', () => {
 
 generateLetterButtons();
 
+let winCount = 0;  // Contador de vitórias
+let loseCount = 0; // Contador de derrotas
+
+document.getElementById('category-select').addEventListener('change', (event) => {
+    getRandomItem();
+    event.target.value = ''; // Desmarcar a seleção de categoria
+});
+
+function updateScore() {
+    document.getElementById('win-count').innerText = winCount;
+    document.getElementById('lose-count').innerText = loseCount;
+}
+
+// Função que atualiza o status do jogo
+function checkEndGame() {
+    const allLettersRevealed = selectedMovieTitle.split(' ').every(word => {
+        return word.split('').every(letter => {
+            const normalizedLetter = normalizeText(letter);
+            return correctLetters.includes(normalizedLetter) || letter.match(/[!?,.:;'"&-]/);
+        });
+    });
+
+    if (allLettersRevealed) {
+        isGameActive = false; // O jogo termina por vitória
+        winCount++;  // Incrementa o contador de vitórias
+        displayMovieInfo(); // Exibe informações do filme
+        setTimeout(() => alert('Parabéns! Você adivinhou!'), 100); // Alterar a mensagem
+    } else if (wrongLetters.length >= 6) { // Se o jogador errou 6 vezes
+        isGameActive = false; // O jogo termina por derrota
+        loseCount++;  // Incrementa o contador de derrotas
+        displayWord(true); // Preenche as letras faltantes e destaca em vermelho
+        displayMovieInfo(); // Exibe informações do filme na derrota
+        setTimeout(() => alert(`Fim de jogo! Era: ${selectedMovieTitle}`), 100); // Alterar a mensagem
+    }
+
+    updateScore(); // Atualiza os contadores na tela
+}
