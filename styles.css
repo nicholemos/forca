@@ -114,3 +114,38 @@ body {
         font-size: 1em; /* Tamanho de fonte ajustado */
     }
 }
+
+
+#score-board {
+    background-color: #f4f4f9; /* Fundo claro */
+    border-radius: 10px; /* Bordas arredondadas */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 250px; /* Largura fixa */
+    text-align: center; /* Alinhar o texto ao centro */
+    margin: 20px auto; /* Centralizar o componente na tela */
+}
+
+#score-board p {
+    font-size: 18px; /* Tamanho de fonte maior */
+    margin: 10px 0; /* Espaçamento entre os parágrafos */
+    font-family: 'Arial', sans-serif; /* Fonte simples e limpa */
+}
+
+#win-count, #lose-count {
+    font-weight: bold; /* Deixar o número mais destacado */
+    font-size: 24px; /* Tamanho de fonte maior para os números */
+}
+
+#win-count {
+    color: #4CAF50; /* Cor verde para vitórias */
+}
+
+#lose-count {
+    color: #F44336; /* Cor vermelha para derrotas */
+}
+
+#score-board p:hover {
+    color: #333; /* Cor de destaque ao passar o mouse */
+    transition: all 0.3s ease; /* Transição suave de cor */
+}
