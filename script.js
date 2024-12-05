@@ -10,6 +10,33 @@ let isGameActive = true;
 
 document.getElementById('category-select').addEventListener('change', getRandomItem);
 
+// Quando o botão de reset for pressionado
+document.getElementById('reset-button').addEventListener('click', () => {
+    resetGame(); // Reseta o estado do jogo
+    getRandomItem(); // Recarrega um novo item da API após reset
+});
+
+
+// Função para reiniciar o jogo
+function resetGame() {
+    correctLetters = [];
+    wrongLetters = [];
+    displayWord();
+    document.getElementById('wrong-letters-span').innerText = '';
+    updateErrorImage();
+    const movieCoverElement = document.getElementById('movie-cover');
+    const movieApprovalElement = document.getElementById('movie-approval');
+    movieCoverElement.src = '';
+    movieCoverElement.style.display = 'none';
+    movieApprovalElement.innerText = '';
+    movieApprovalElement.style.display = 'none';
+    isGameActive = true;
+    selectedMovieTitle = '';
+    selectedMovieCover = '';
+    selectedMovieRating = '';
+}
+
+
 // Função para buscar um item aleatório com base na categoria selecionada
 async function getRandomItem() {
     const category = document.getElementById('category-select').value;
