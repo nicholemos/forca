@@ -38,10 +38,14 @@ function resetGame() {
     updateScore(); // Zerando o placar
 }
 
+// Evento para capturar a alteração da categoria através dos botões de rádio
+document.querySelectorAll('input[name="category"]').forEach((radio) => {
+    radio.addEventListener('change', getRandomItem);
+});
 
 // Função para buscar um item aleatório com base na categoria selecionada
 async function getRandomItem() {
-    const category = document.getElementById('category-select').value;
+    const category = document.querySelector('input[name="category"]:checked')?.value; // Obtém a categoria selecionada
     if (!category) return; // Verifica se a categoria foi selecionada antes de buscar os dados
 
     try {
