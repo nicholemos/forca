@@ -1,317 +1,172 @@
-const apiKey = 'f3853edb736e04c1a9cb685d8a8951d0';
-const minPage = 1;
-const maxPage = 300;
-let selectedMovieTitle;
-let selectedMovieCover;
-let selectedMovieRating;
-let wrongLetters = [];
+// Chave da API do The Movie Database
+const apiKey = 'SUA_CHAVE_API_AQUI';
 let correctLetters = [];
+let wrongLetters = [];
+let randomItem = '';
+let errorCount = 0;
 let isGameActive = true;
 
-document.getElementById('category-select').addEventListener('change', getRandomItem);
+// Referências aos elementos do DOM
+const wordContainer = document.getElementById('word');
+const wrongLettersSpan = document.getElementById('wrong-letters-span');
+const resetButton = document.getElementById('reset-button');
+const errorImage = document.getElementById('error-image');
+const movieCover = document.getElementById('movie-cover');
+const movieApproval = document.getElementById('movie-approval');
+const winCountSpan = document.getElementById('win-count');
+const loseCountSpan = document.getElementById('lose-count');
+let winCount = 0;
+let loseCount = 0;
 
-// Quando o botão de reset for pressionado
-document.getElementById('reset-button').addEventListener('click', () => {
-    resetGame(); // Reseta o estado do jogo
-    // Remover a linha abaixo para evitar carregar um novo item ao clicar "Recomeçar jogo"
-    // getRandomItem(); // Recarrega um novo item da API após reset
-});
-
-
-// Função para reiniciar o jogo
-function resetGame() {
-    correctLetters = [];
-    wrongLetters = [];
-    displayWord();
-    document.getElementById('wrong-letters-span').innerText = '';
-    updateErrorImage();
-    const movieCoverElement = document.getElementById('movie-cover');
-    const movieApprovalElement = document.getElementById('movie-approval');
-    movieCoverElement.src = '';
-    movieCoverElement.style.display = 'none';
-    movieApprovalElement.innerText = '';
-    movieApprovalElement.style.display = 'none';
-    isGameActive = true;
-    selectedMovieTitle = '';
-    selectedMovieCover = '';
-    selectedMovieRating = '';
-    updateScore(); // Zerando o placar
+// Atualiza o placar de vitórias e derrotas
+function updateScore() {
+    winCountSpan.textContent = winCount;
+    loseCountSpan.textContent = loseCount;
 }
 
-// Evento para capturar a alteração da categoria através dos botões de rádio
-document.querySelectorAll('input[name="category"]').forEach((radio) => {
-    radio.addEventListener('change', getRandomItem);
-});
-
-// Função para buscar um item aleatório com base na categoria selecionada
-async function getRandomItem() {
-    const category = document.querySelector('input[name="category"]:checked')?.value; // Obtém a categoria selecionada
-    if (!category) return; // Verifica se a categoria foi selecionada antes de buscar os dados
-
-    try {
-        let validItemFound = false;
-        let randomItem;
-
-        while (!validItemFound) {
-            const randomPage = Math.floor(Math.random() * (maxPage - minPage + 1)) + minPage;
-            let apiUrl;
-
-            // Configura a URL da API com base na categoria escolhida
-            if (category === 'filmes') {
-                apiUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
-            } else if (category === 'series') {
-                apiUrl = `https://api.themoviedb.org/3/tv/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
-            } else if (category === 'pessoas') {
-                apiUrl = `https://api.themoviedb.org/3/person/popular?api_key=${apiKey}&language=pt-BR&page=${randomPage}`;
-            }
-
-            const response = await fetch(apiUrl);
-            if (!response.ok) throw new Error('Erro na resposta da API');
-
-            const data = await response.json();
-            if (!data.results.length) throw new Error('Nenhum item encontrado');
-
-            // Filtra os itens para garantir que os títulos sejam válidos
-            const validItems = data.results.filter(item => {
-                const title = item.title || item.name;
-                const normalizedTitle = normalizeText(title); // Normaliza o título
-                return /^[A-Z0-9\s'.-]+$/u.test(normalizedTitle); // Verifica se o título contém apenas letras e espaços
-            });
-
-            if (validItems.length === 0) throw new Error('Nenhum item válido encontrado');
-
-            randomItem = validItems[Math.floor(Math.random() * validItems.length)];
-            selectedMovieTitle = randomItem.title || randomItem.name;
-
-            // Verifica se randomItem tem a propriedade correta para a categoria
-            if (category === 'pessoas') {
-                if (randomItem.profile_path) {
-                    selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.profile_path}`;
-                } else {
-                    selectedMovieCover = ''; // ou uma imagem padrão, se preferir
-                }
-            } else {
-                if (randomItem.poster_path) {
-                    selectedMovieCover = `https://image.tmdb.org/t/p/w500${randomItem.poster_path}`;
-                } else {
-                    selectedMovieCover = ''; // ou uma imagem padrão, se preferir
-                }
-            }
-
-            selectedMovieRating = randomItem.vote_average;
-
-            validItemFound = true;
-        }
-
-        resetGame(); // Não chamar getRandomItem aqui após reset
-        displayWord();
-    } catch (error) {
-        console.error('Erro ao buscar item:', error);
-        alert('Não foi possível carregar os dados do item. Por favor, tente novamente mais tarde.');
-    }
-}
-
-function normalizeText(text) {
-    return text
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')  // Remove acentos
-        .replace(/[\u4E00-\u9FAF\uFF00-\uFFEF]/g, '') // Remove caracteres japoneses (kanji e katakana)
-        .replace(/[^A-Z0-9KWY\s!?,.:;'"&-]/gi, '')  // Mantém letras A-Z, K, W, Y, números e caracteres especiais
-        .toUpperCase();  // Converte para maiúsculas
-}
-
-function displayWord(isGameLost = false) {
-    const wordElement = document.getElementById('word');
-    wordElement.innerHTML = selectedMovieTitle
-        .split(' ')
-        .map(word => {
-            return word.split('').map(letter => {
-                const normalizedLetter = normalizeText(letter);
-
-                if (letter.match(/[!?,.:;'"&-]/)) {
-                    return letter; // Mantém os caracteres especiais
-                } else if (correctLetters.includes(normalizedLetter)) {
-                    return `<span>${letter}</span>`; // Letras adivinhadas corretamente
-                } else if (isGameLost) {
-                    return `<span style="color:red">${letter}</span>`; // Letras erradas ficam vermelhas após o fim do jogo
-                } else {
-                    return '_'; // Exibe sublinhado se a letra ainda não foi adivinhada
-                }
-            }).join('');
-        })
-        .join(' ');
-}
-
-
+// Atualiza a imagem de erros
 function updateErrorImage() {
-    const errorImage = document.getElementById('error-image');
-    const errorCount = Math.min(wrongLetters.length, 6);
     errorImage.src = `${errorCount}erro.png`;
 }
 
-function handleLetterInput(letter) {
-    // Normaliza a letra antes de verificar
-    const normalizedLetter = normalizeText(letter);
-    const sanitizedTitle = normalizeText(selectedMovieTitle);
-
-    // Verifica se a letra ou número já foi usado
-    if (correctLetters.includes(normalizedLetter) || wrongLetters.includes(normalizedLetter)) {
-        return; // Ignora se já foi usado
-    }
-
-    // Verifica se a letra ou número faz parte do título
-    if (sanitizedTitle.includes(normalizedLetter) || selectedMovieTitle.includes(letter)) {
-        correctLetters.push(normalizedLetter); // Adiciona a letra ou número correto
-    } else {
-        wrongLetters.push(normalizedLetter); // Adiciona à lista de erros
-    }
-
-
-    updateGameStatus();
+// Atualiza a palavra na tela
+function displayWord() {
+    wordContainer.innerHTML = randomItem
+        .split('')
+        .map((letter) =>
+            correctLetters.includes(letter.toUpperCase())
+                ? `<span>${letter}</span>`
+                : `<span>_</span>`
+        )
+        .join('');
 }
 
+// Seleciona um item aleatório da API baseado na categoria
+async function getRandomItem() {
+    const selectedCategory = document.querySelector('input[name="category"]:checked')?.value;
 
-function updateGameStatus() {
-    displayWord();
-    updateWrongLetters();
-    updateErrorImage();
+    if (!selectedCategory) {
+        alert('Por favor, selecione uma categoria.');
+        return;
+    }
+
+    let apiUrl = '';
+    if (selectedCategory === 'filmes') {
+        apiUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
+    } else if (selectedCategory === 'series') {
+        apiUrl = `https://api.themoviedb.org/3/tv/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
+    } else if (selectedCategory === 'pessoas') {
+        apiUrl = `https://api.themoviedb.org/3/person/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
+    }
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const randomIndex = Math.floor(Math.random() * data.results.length);
+        const selectedItem = data.results[randomIndex];
+
+        if (selectedCategory === 'pessoas') {
+            randomItem = selectedItem.name.toUpperCase();
+        } else {
+            randomItem = selectedItem.title ? selectedItem.title.toUpperCase() : selectedItem.name.toUpperCase();
+        }
+
+        // Exibe capa e aprovação (apenas para filmes/séries)
+        if (selectedCategory !== 'pessoas') {
+            movieCover.src = `https://image.tmdb.org/t/p/w500${selectedItem.poster_path}`;
+            movieCover.style.display = 'block';
+            movieApproval.textContent = `Popularidade: ${selectedItem.popularity.toFixed(1)}`;
+            movieApproval.style.display = 'block';
+        } else {
+            movieCover.style.display = 'none';
+            movieApproval.style.display = 'none';
+        }
+
+        correctLetters = [];
+        wrongLetters = [];
+        errorCount = 0;
+        isGameActive = true;
+        updateErrorImage();
+        displayWord();
+    } catch (error) {
+        alert('Erro ao buscar dados. Tente novamente.');
+        console.error(error);
+    }
+}
+
+// Verifica o final do jogo
+function checkEndGame() {
+    const guessedWord = wordContainer.innerText.replace(/\s+/g, '');
+    if (guessedWord === randomItem) {
+        alert('Parabéns! Você venceu!');
+        winCount++;
+        isGameActive = false;
+        updateScore();
+    } else if (errorCount >= 6) {
+        alert(`Você perdeu! A palavra era: ${randomItem}`);
+        loseCount++;
+        isGameActive = false;
+        updateScore();
+    }
+}
+
+// Lida com a entrada de letras
+function handleLetterInput(letter) {
+    if (!isGameActive) return;
+
+    if (randomItem.includes(letter)) {
+        if (!correctLetters.includes(letter)) {
+            correctLetters.push(letter);
+            displayWord();
+        }
+    } else {
+        if (!wrongLetters.includes(letter)) {
+            wrongLetters.push(letter);
+            errorCount++;
+            wrongLettersSpan.textContent = wrongLetters.join(', ');
+            updateErrorImage();
+        }
+    }
+
     checkEndGame();
 }
 
-function updateWrongLetters() {
-    const wrongLettersSpan = document.getElementById('wrong-letters-span');
-    wrongLettersSpan.innerText = wrongLetters.join(', ');
-}
+// Configura o teclado virtual
+function setupKeyboard() {
+    const keyboardContainer = document.getElementById('letter-buttons');
+    keyboardContainer.innerHTML = '';
 
-function checkEndGame() {
-    const allLettersRevealed = selectedMovieTitle.split(' ').every(word => {
-        return word.split('').every(letter => {
-            const normalizedLetter = normalizeText(letter);
-            return correctLetters.includes(normalizedLetter) || letter.match(/[!?,.:;'"&-]/);
-        });
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((letter) => {
+        const button = document.createElement('button');
+        button.textContent = letter;
+        button.addEventListener('click', () => handleLetterInput(letter));
+        keyboardContainer.appendChild(button);
     });
-
-    if (allLettersRevealed) {
-        isGameActive = false; // O jogo termina por vitória
-        displayMovieInfo(); // Exibe informações do filme
-        setTimeout(() => alert('Parabéns! Você adivinhou!'), 100); // Alterar a mensagem
-    } else if (wrongLetters.length >= 6) { // Se o jogador errou 6 vezes
-        isGameActive = false; // O jogo termina por derrota
-        displayWord(true); // Preenche as letras faltantes e destaca em vermelho
-        displayMovieInfo(); // Exibe informações do filme na derrota
-        setTimeout(() => alert(`Fim de jogo! Era: ${selectedMovieTitle}`), 100); // Alterar a mensagem
-    }
 }
 
-
-function displayMovieInfo() {
-    const movieCoverElement = document.getElementById('movie-cover');
-    const movieApprovalElement = document.getElementById('movie-approval');
-    movieCoverElement.src = selectedMovieCover;
-    movieCoverElement.style.display = 'block';
-
-    // Verifica se a categoria é 'pessoas'
-    const category = document.getElementById('category-select').value;
-    if (category === 'pessoas') {
-        movieApprovalElement.style.display = 'none'; // Oculta a avaliação para pessoas
-    } else {
-        movieApprovalElement.innerText = `Avaliação: ${selectedMovieRating}`;
-        movieApprovalElement.style.display = 'block';
-    }
-}
-
-
-
+// Reinicia o jogo
 function resetGame() {
     correctLetters = [];
     wrongLetters = [];
-    displayWord();
-    document.getElementById('wrong-letters-span').innerText = '';
-    updateErrorImage();
-    const movieCoverElement = document.getElementById('movie-cover');
-    const movieApprovalElement = document.getElementById('movie-approval');
-    movieCoverElement.src = '';
-    movieCoverElement.style.display = 'none';
-    movieApprovalElement.innerText = '';
-    movieApprovalElement.style.display = 'none';
+    wrongLettersSpan.textContent = '';
+    wordContainer.innerHTML = '';
+    errorCount = 0;
     isGameActive = true;
+    movieCover.style.display = 'none';
+    movieApproval.style.display = 'none';
+    updateErrorImage();
+    getRandomItem();
 }
+
+// Listeners
+resetButton.addEventListener('click', resetGame);
 
 window.addEventListener('keydown', (e) => {
-    console.log(e); // Log do evento para verificação
-    let letter = e.key.toUpperCase();
-
-    // Captura números do teclado numérico e do teclado padrão
-    if (e.code.startsWith('Numpad')) {
-        letter = e.key; // Para números do teclado numérico
-    }
-
-    // Verifica se a tecla pressionada é uma letra ou número
-    if (/^[A-Z0-9]$/.test(letter) && isGameActive) {
+    const letter = e.key.toUpperCase();
+    if (/^[A-Z]$/.test(letter)) {
         handleLetterInput(letter);
-    } else {
-        console.log('Tecla inválida:', letter); // Log de tecla inválida para depuração
     }
 });
 
-
-function generateLetterButtons() {
-    const letterButtonsContainer = document.getElementById('letter-buttons');
-    letterButtonsContainer.innerHTML = '';
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    alphabet.split('').forEach(letter => {
-        const button = document.createElement('button');
-        button.innerText = letter;
-        button.addEventListener('click', () => {
-            if (isGameActive) {
-                handleLetterInput(letter);
-            }
-        });
-        letterButtonsContainer.appendChild(button);
-    });
-}
-
-document.getElementById('reset-button').addEventListener('click', () => {
-    resetGame();
-    getRandomItem(); // Busca um novo item após o reset
-});
-
-generateLetterButtons();
-
-let winCount = 0;  // Contador de vitórias
-let loseCount = 0; // Contador de derrotas
-
-document.getElementById('category-select').addEventListener('change', (event) => {
-    getRandomItem();
-    event.target.value = ''; // Desmarcar a seleção de categoria
-});
-
-function updateScore() {
-    document.getElementById('win-count').innerText = winCount;
-    document.getElementById('lose-count').innerText = loseCount;
-}
-
-// Função que atualiza o status do jogo
-function checkEndGame() {
-    const allLettersRevealed = selectedMovieTitle.split(' ').every(word => {
-        return word.split('').every(letter => {
-            const normalizedLetter = normalizeText(letter);
-            return correctLetters.includes(normalizedLetter) || letter.match(/[!?,.:;'"&-]/);
-        });
-    });
-
-    if (allLettersRevealed) {
-        isGameActive = false; // O jogo termina por vitória
-        winCount++;  // Incrementa o contador de vitórias
-        displayMovieInfo(); // Exibe informações do filme
-        setTimeout(() => alert('Parabéns! Você adivinhou!'), 100); // Alterar a mensagem
-    } else if (wrongLetters.length >= 6) { // Se o jogador errou 6 vezes
-        isGameActive = false; // O jogo termina por derrota
-        loseCount++;  // Incrementa o contador de derrotas
-        displayWord(true); // Preenche as letras faltantes e destaca em vermelho
-        displayMovieInfo(); // Exibe informações do filme na derrota
-        setTimeout(() => alert(`Fim de jogo! Era: ${selectedMovieTitle}`), 100); // Alterar a mensagem
-    }
-
-    updateScore(); // Atualiza os contadores na tela
-}
+// Inicialização
+setupKeyboard();
