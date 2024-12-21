@@ -1,172 +1,210 @@
-// Chave da API do The Movie Database
-const apiKey = 'SUA_CHAVE_API_AQUI';
-let correctLetters = [];
-let wrongLetters = [];
-let randomItem = '';
-let errorCount = 0;
-let isGameActive = true;
+const apiKey = 'f3853edb736e04c1a9cb685d8a8951d0';
+const CONFIG = {
+    maxErrors: 5,
+    maxPages: 500,
+    allowedChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    punctuation: [',', '.', ';', ':', '!', '?', '-'],
+    messages: {
+        win: 'Parabéns! Você venceu!',
+        lose: 'Você perdeu! Veja o filme:',
+        errorAPI: 'Não foi possível carregar os dados. Tente novamente mais tarde.',
+    },
+};
 
-// Referências aos elementos do DOM
-const wordContainer = document.getElementById('word');
-const wrongLettersSpan = document.getElementById('wrong-letters-span');
-const resetButton = document.getElementById('reset-button');
-const errorImage = document.getElementById('error-image');
-const movieCover = document.getElementById('movie-cover');
-const movieApproval = document.getElementById('movie-approval');
-const winCountSpan = document.getElementById('win-count');
-const loseCountSpan = document.getElementById('lose-count');
-let winCount = 0;
-let loseCount = 0;
+const DOM = {
+    winCount: document.getElementById('win-count'),
+    loseCount: document.getElementById('lose-count'),
+    movieCover: document.getElementById('movie-cover'),
+    movieApproval: document.getElementById('movie-approval'),
+    wordContainer: document.getElementById('word'),
+    wrongLettersSpan: document.getElementById('wrong-letters-span'),
+    errorImage: document.getElementById('error-image'),
+    resetButton: document.getElementById('reset-button'),
+    virtualKeyboard: document.getElementById('virtual-keyboard'),
+};
 
-// Atualiza o placar de vitórias e derrotas
-function updateScore() {
-    winCountSpan.textContent = winCount;
-    loseCountSpan.textContent = loseCount;
-}
+let randomItem = '', correctLetters = [], wrongLetters = [];
+let errorCount = 0, winCount = 0, loseCount = 0, isGameActive = true;
 
-// Atualiza a imagem de erros
-function updateErrorImage() {
-    errorImage.src = `${errorCount}erro.png`;
-}
+// Funções Utilitárias
+const normalizeString = (str) =>
+    str.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacríticos
+        .toUpperCase();
 
-// Atualiza a palavra na tela
-function displayWord() {
-    wordContainer.innerHTML = randomItem
-        .split('')
-        .map((letter) =>
-            correctLetters.includes(letter.toUpperCase())
-                ? `<span>${letter}</span>`
-                : `<span>_</span>`
-        )
-        .join('');
-}
 
-// Seleciona um item aleatório da API baseado na categoria
+const getRandomPage = () => Math.floor(Math.random() * CONFIG.maxPages) + 1;
+
+// Busca Filmes ou Séries
 async function getRandomItem() {
-    const selectedCategory = document.querySelector('input[name="category"]:checked')?.value;
-
-    if (!selectedCategory) {
-        alert('Por favor, selecione uma categoria.');
-        return;
-    }
-
-    let apiUrl = '';
-    if (selectedCategory === 'filmes') {
-        apiUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
-    } else if (selectedCategory === 'series') {
-        apiUrl = `https://api.themoviedb.org/3/tv/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
-    } else if (selectedCategory === 'pessoas') {
-        apiUrl = `https://api.themoviedb.org/3/person/popular?api_key=${apiKey}&language=pt-BR&page=${Math.floor(Math.random() * 10) + 1}`;
-    }
-
     try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const randomIndex = Math.floor(Math.random() * data.results.length);
-        const selectedItem = data.results[randomIndex];
+        const category = document.querySelector('input[name="category"]:checked').value;
+        const page = getRandomPage();
+        const endpoint = category === 'filmes' ? 'movie/popular' : 'tv/popular';
+        const apiUrl = `https://api.themoviedb.org/3/${endpoint}?api_key=${apiKey}&language=pt-BR&page=${page}`;
 
-        if (selectedCategory === 'pessoas') {
-            randomItem = selectedItem.name.toUpperCase();
+        const { results } = await (await fetch(apiUrl)).json();
+        const item = results[Math.floor(Math.random() * results.length)];
+
+        randomItem = normalizeString(category === 'filmes' ? item.title : item.name);
+        DOM.movieCover.src = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+        DOM.movieApproval.textContent = `Popularidade: ${item.popularity.toFixed(1)}`;
+
+        // Chame o resetGame após garantir que o randomItem foi configurado corretamente
+        if (randomItem && randomItem.length > 0) {
+            resetGame();
         } else {
-            randomItem = selectedItem.title ? selectedItem.title.toUpperCase() : selectedItem.name.toUpperCase();
+            console.error('Erro: Nenhum item válido retornado.');
+            alert(CONFIG.messages.errorAPI);
         }
 
-        // Exibe capa e aprovação (apenas para filmes/séries)
-        if (selectedCategory !== 'pessoas') {
-            movieCover.src = `https://image.tmdb.org/t/p/w500${selectedItem.poster_path}`;
-            movieCover.style.display = 'block';
-            movieApproval.textContent = `Popularidade: ${selectedItem.popularity.toFixed(1)}`;
-            movieApproval.style.display = 'block';
-        } else {
-            movieCover.style.display = 'none';
-            movieApproval.style.display = 'none';
-        }
-
-        correctLetters = [];
-        wrongLetters = [];
-        errorCount = 0;
-        isGameActive = true;
-        updateErrorImage();
-        displayWord();
     } catch (error) {
-        alert('Erro ao buscar dados. Tente novamente.');
         console.error(error);
+        alert(CONFIG.messages.errorAPI);
     }
 }
 
-// Verifica o final do jogo
-function checkEndGame() {
-    const guessedWord = wordContainer.innerText.replace(/\s+/g, '');
-    if (guessedWord === randomItem) {
-        alert('Parabéns! Você venceu!');
-        winCount++;
-        isGameActive = false;
-        updateScore();
-    } else if (errorCount >= 6) {
-        alert(`Você perdeu! A palavra era: ${randomItem}`);
-        loseCount++;
-        isGameActive = false;
-        updateScore();
-    }
-}
-
-// Lida com a entrada de letras
-function handleLetterInput(letter) {
-    if (!isGameActive) return;
-
-    if (randomItem.includes(letter)) {
-        if (!correctLetters.includes(letter)) {
-            correctLetters.push(letter);
-            displayWord();
-        }
-    } else {
-        if (!wrongLetters.includes(letter)) {
-            wrongLetters.push(letter);
-            errorCount++;
-            wrongLettersSpan.textContent = wrongLetters.join(', ');
-            updateErrorImage();
-        }
-    }
-
-    checkEndGame();
-}
-
-// Configura o teclado virtual
-function setupKeyboard() {
-    const keyboardContainer = document.getElementById('letter-buttons');
-    keyboardContainer.innerHTML = '';
-
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((letter) => {
-        const button = document.createElement('button');
-        button.textContent = letter;
-        button.addEventListener('click', () => handleLetterInput(letter));
-        keyboardContainer.appendChild(button);
-    });
-}
-
-// Reinicia o jogo
-function resetGame() {
-    correctLetters = [];
-    wrongLetters = [];
-    wrongLettersSpan.textContent = '';
-    wordContainer.innerHTML = '';
-    errorCount = 0;
-    isGameActive = true;
-    movieCover.style.display = 'none';
-    movieApproval.style.display = 'none';
-    updateErrorImage();
+// Jogo
+function startGame() {
     getRandomItem();
 }
 
-// Listeners
-resetButton.addEventListener('click', resetGame);
+function adjustWordSpacing() {
+    const wordElement = DOM.wordContainer;
+    const parentWidth = wordElement.parentElement.offsetWidth;
+    const wordWidth = wordElement.scrollWidth;
 
-window.addEventListener('keydown', (e) => {
-    const letter = e.key.toUpperCase();
-    if (/^[A-Z]$/.test(letter)) {
-        handleLetterInput(letter);
+    if (wordWidth > parentWidth) {
+        const scalingFactor = parentWidth / wordWidth;
+        wordElement.style.fontSize = `${Math.max(1, 2 * scalingFactor)}rem`;
+    } else {
+        wordElement.style.fontSize = '2rem'; // Valor padrão
     }
+}
+
+
+// Chame essa função sempre que o jogo começar ou reiniciar
+function resetGame() {
+    correctLetters = [];
+    wrongLetters = [];
+    errorCount = 0;
+    isGameActive = true;
+
+    updateErrorImage();
+    displayWord(true);
+    updateWrongLetters();
+    toggleMovieInfo(false);
+    updateVirtualKeyboard();
+    adjustWordSpacing(); // Ajusta o espaçamento inicial
+}
+
+function displayWord(isGameStart = false) {
+    const displayed = randomItem.split('').map(letter => {
+        if (CONFIG.punctuation.includes(letter)) return letter; // Mantém pontuações
+        if (letter === ' ') return ' '; // Espaço normal para separação entre palavras
+
+        // Mostra letras adivinhadas ou '_'
+        return correctLetters.includes(letter) ? letter : '_';
+    });
+
+    DOM.wordContainer.innerHTML = displayed.join(' '); // Junta letras com espaço entre elas
+    checkGameProgress(displayed, isGameStart);
+}
+
+function checkGameProgress(displayed, isGameStart) {
+    if (!isGameStart && isGameActive) { // Verifica se o jogo está ativo
+        if (!displayed.includes('_')) {
+            endGame(true); // Vitória
+        }
+    }
+}
+
+// Manipula Teclado Virtual
+function updateVirtualKeyboard() {
+    if (DOM.virtualKeyboard.childNodes.length) return; // Evita recriação
+    DOM.virtualKeyboard.innerHTML = CONFIG.allowedChars.split('').map(char =>
+        `<button onclick="handleLetterInput('${char}')">${char}</button>`
+    ).join('');
+}
+
+// Atualiza Letras Erradas
+function updateWrongLetters() {
+    DOM.wrongLettersSpan.textContent = wrongLetters.join(', ');
+}
+
+// Verifica Letra Input
+function handleLetterInput(letter) {
+    if (!isGameActive || wrongLetters.includes(letter) || correctLetters.includes(letter)) return;
+
+    const normalizedItem = normalizeString(randomItem); // Normaliza o texto do item
+    const normalizedLetter = normalizeString(letter); // Normaliza a letra inserida
+
+    if (normalizedItem.includes(normalizedLetter)) {
+        // Adiciona as letras originais correspondentes à letra normalizada
+        randomItem.split('').forEach((originalLetter, index) => {
+            if (normalizeString(originalLetter) === normalizedLetter && !correctLetters.includes(originalLetter)) {
+                correctLetters.push(originalLetter);
+            }
+        });
+    } else {
+        wrongLetters.push(letter);
+        errorCount++;
+        updateErrorImage();
+        if (errorCount >= CONFIG.maxErrors) {
+            endGame(false); // Derrota
+        }
+    }
+
+    displayWord(); // Atualiza a exibição da palavra
+    updateWrongLetters(); // Atualiza as letras erradas
+}
+
+
+
+// Finaliza Jogo
+function endGame(isVictory) {
+    if (!isGameActive) return; // Garante que não será chamada mais de uma vez
+    isGameActive = false;
+
+    toggleMovieInfo(true);
+    alert(isVictory ? CONFIG.messages.win : CONFIG.messages.lose);
+    isVictory ? winCount++ : loseCount++;
+    updateScoreboard();
+    displayWord(true);
+}
+
+function toggleMovieInfo(show) {
+    DOM.movieCover.style.display = show ? 'block' : 'none';
+    DOM.movieApproval.style.display = show ? 'block' : 'none';
+}
+
+function updateErrorImage() {
+    DOM.errorImage.src = `${errorCount}erro.png`;
+}
+
+function updateScoreboard() {
+    DOM.winCount.textContent = winCount;
+    DOM.loseCount.textContent = loseCount;
+}
+
+// Reinicia o jogo ao trocar de categoria
+function handleCategoryChange() {
+    if (isGameActive) resetGame();
+    startGame();
+}
+
+// Eventos
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', handleCategoryChange);
+});
+DOM.resetButton.addEventListener('click', startGame);
+document.addEventListener('keydown', (e) => {
+    const letter = e.key.toUpperCase();
+    if (/^[A-Z0-9]$/.test(letter)) handleLetterInput(letter);
 });
 
-// Inicialização
-setupKeyboard();
+
+
+
+// Inicializa
+startGame();
