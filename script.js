@@ -111,16 +111,29 @@ function displayWord(isGameStart = false) {
         return correctLetters.includes(letter) ? letter : '_';
     });
 
-    DOM.wordContainer.innerHTML = displayed.join(' '); // Junta letras com espaço entre elas
+    // Se o jogo não está começando, deve mostrar todas as letras não adivinhadas ao final
+    if (!isGameStart && !displayed.includes('_')) {
+        // Se não há mais "_" significa que o jogador venceu
+        endGame(true); // Vitória
+    } else if (!isGameStart && errorCount >= CONFIG.maxErrors) {
+        // Se o número de erros ultrapassou o limite, o jogador perdeu
+        endGame(false); // Derrota
+    }
+
+    // Exibe a palavra no contêiner
+    DOM.wordContainer.innerHTML = displayed.join(' '); // Junta as letras com espaços
+
+    // Se o jogo acabou, mostra todas as letras faltantes
     if (!isGameStart) {
-        // Se o jogo não está começando, deve mostrar todas as letras não adivinhadas ao final
-        if (!displayed.includes('_')) {
-            endGame(true); // Vitória
-        } else if (errorCount >= CONFIG.maxErrors) {
-            endGame(false); // Derrota
-        }
+        randomItem.split('').forEach(letter => {
+            if (!correctLetters.includes(letter)) {
+                correctLetters.push(letter); // Revela todas as letras
+            }
+        });
     }
 }
+
+
 
 // Manipula Teclado Virtual
 function updateVirtualKeyboard() {
@@ -179,6 +192,7 @@ function endGame(isVictory) {
     // Atualiza as letras erradas
     updateWrongLetters();
 }
+
 
 function toggleMovieInfo(show) {
     DOM.movieCover.style.display = show ? 'block' : 'none';
