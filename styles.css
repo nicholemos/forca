@@ -1,183 +1,31 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    overflow-x: hidden;
-    /* Previne o estouro horizontal */
-}
-
-#forca-container {
-    margin: 20px 0;
-}
-
 #word {
     font-size: 2em;
     text-align: center;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px; /* Aumenta o espaçamento entre as palavras */
-    letter-spacing: 4px; /* Reduz o espaçamento entre as letras */
+    gap: 20px; /* Aumenta o espaçamento entre as palavras */
+    letter-spacing: 2px; /* Reduz o espaçamento entre as letras */
     overflow: hidden; /* Evita que palavras extrapolem o contêiner */
     max-width: 100%;
     margin: 0 auto;
 }
 
-
-
-#wrong-letters {
-    margin: 20px 0;
-    color: red;
-}
-
-#letter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-#letter-buttons button {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2em;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#letter-buttons button:hover {
-    background-color: #0056b3;
-}
-
-#reset-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1em;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#reset-button:hover {
-    background-color: #218838;
-}
-
-.game-info {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-.box {
-    width: 45%;
-    text-align: center;
-}
-
-#movie-cover {
-    max-width: 100%;
-    height: auto;
-}
-
-#error-image {
-    max-width: 100%;
-    height: auto;
-}
-
 .missing-letter {
     color: red;
     font-weight: bold;
 }
 
-#virtual-keyboard {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 20px;
-}
-
-#virtual-keyboard button {
-    padding: 10px;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-#virtual-keyboard {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 20px;
-}
-
-#virtual-keyboard button {
-    padding: 10px 15px;
-    font-size: 18px;
-    cursor: pointer;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    background: linear-gradient(to bottom, #007bff, #0056b3);
-    color: white;
-    transition: transform 0.2s, background 0.3s;
-}
-
-#virtual-keyboard button:hover {
-    transform: scale(1.1);
-    background: linear-gradient(to bottom, #0056b3, #007bff);
-}
-
-#virtual-keyboard button:active {
-    transform: scale(0.95);
-    background: #003d82;
-}
-
-#word {
-    font-size: 2em;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    letter-spacing: 10px;
-    /* Ajusta dinamicamente o espaçamento */
-    overflow: hidden;
-    /* Evita que palavras extrapolem o contêiner */
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-.missing-letter {
-    color: red;
-    font-weight: bold;
+#word span {
+    margin-right: 10px; /* Aumenta o espaçamento entre as letras dentro das palavras */
 }
 
 /* Ajuste para telas menores */
 @media (max-width: 768px) {
-    #virtual-keyboard button {
-        font-size: 16px;
-        padding: 8px 12px;
-    }
-
-      #word {
+    #word {
         font-size: 1.5em;
         /* Reduz o tamanho da fonte para telas menores */
-        letter-spacing: 10px;
-        /* Ajusta o espaçamento das letras */
+        letter-spacing: 2px; /* Ajusta o espaçamento das letras */
     }
 
     .box {
@@ -194,5 +42,4 @@ body {
         font-size: 1em;
         /* Tamanho de fonte ajustado */
     }
-
 }
