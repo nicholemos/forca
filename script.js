@@ -79,10 +79,10 @@ function adjustWordSpacing() {
     if (wordWidth > parentWidth) {
         const scalingFactor = parentWidth / wordWidth;
         wordElement.style.fontSize = `${Math.max(1, 2 * scalingFactor)}rem`;
-        wordElement.style.wordWrap = 'break-word'; // Garantir que a palavra se ajuste sem quebrar
+        wordElement.style.whiteSpace = 'nowrap'; // Impede que a palavra quebre
     } else {
         wordElement.style.fontSize = '2rem'; // Valor padrão
-        wordElement.style.wordWrap = 'normal'; // Não permitir quebra
+        wordElement.style.whiteSpace = 'normal'; // Permite que a palavra quebre normalmente
     }
 }
 
