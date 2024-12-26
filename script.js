@@ -102,6 +102,7 @@ function resetGame() {
     adjustWordSpacing(); // Ajusta o espaçamento inicial
 }
 
+// Função de verificação e exibição das letras
 function displayWord(isGameStart = false) {
     const displayed = randomItem.split('').map(letter => {
         if (CONFIG.punctuation.includes(letter)) return letter; // Mantém pontuações
@@ -112,14 +113,19 @@ function displayWord(isGameStart = false) {
             return `<span class="missing-letter">${letter}</span>`;
         }
 
-        // Mostra letras adivinhadas ou '_'
-        return correctLetters.includes(letter) ? letter : '_';
+        // Verifica se a letra foi adivinhada
+        if (correctLetters.includes(letter)) {
+            return letter;  // Exibe a letra correta
+        } else {
+            // Se a letra não foi adivinhada, exibe "_"
+            return '_';
+        }
     });
 
     // Exibe a palavra no contêiner
     DOM.wordContainer.innerHTML = displayed.join(' '); // Junta as letras com espaços
 
-    // Verifica se o jogador venceu ou perdeu apenas quando o jogo não está começando
+    // Verifica se o jogador venceu ou perdeu
     if (!isGameStart) {
         // Verifica se o jogador completou todas as letras corretamente
         if (!displayed.includes('_')) {
@@ -153,14 +159,20 @@ function handleLetterInput(letter) {
     const normalizedItem = normalizeString(randomItem); // Normaliza o texto do item
     const normalizedLetter = normalizeString(letter); // Normaliza a letra inserida
 
-    if (normalizedItem.includes(normalizedLetter)) {
-        // Adiciona as letras originais correspondentes à letra normalizada
-        randomItem.split('').forEach((originalLetter, index) => {
-            if (normalizeString(originalLetter) === normalizedLetter && !correctLetters.includes(originalLetter)) {
-                correctLetters.push(originalLetter);
-            }
+    const findMatchingLetter = (normalizedLetter) => {
+        // Encontra a letra correta (acentuada) correspondente à versão sem acento
+        return randomItem.split('').find((originalLetter) => {
+            return normalizeString(originalLetter) === normalizedLetter;
         });
+    }
+
+    const matchingLetter = findMatchingLetter(normalizedLetter);
+
+    if (matchingLetter) {
+        // Se a letra normalizada corresponde à uma letra na palavra (com ou sem acento)
+        correctLetters.push(matchingLetter);
     } else {
+        // Caso contrário, adiciona a letra às erradas
         wrongLetters.push(letter);
         errorCount++;
         updateErrorImage();
