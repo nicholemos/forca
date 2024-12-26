@@ -112,16 +112,18 @@ function displayWord(isGameStart = false) {
     });
 
     // Se o jogo não está começando, deve mostrar todas as letras não adivinhadas ao final
-    if (!isGameStart && !displayed.includes('_')) {
-        // Se não há mais "_" significa que o jogador venceu
-        endGame(true); // Vitória
-    } else if (!isGameStart && errorCount >= CONFIG.maxErrors) {
-        // Se o número de erros ultrapassou o limite, o jogador perdeu
-        endGame(false); // Derrota
-    }
-
-    // Exibe a palavra no contêiner
     DOM.wordContainer.innerHTML = displayed.join(' '); // Junta as letras com espaços
+
+    // Verifica se o jogador venceu ou perdeu apenas quando o jogo não está começando
+    if (!isGameStart) {
+        if (!displayed.includes('_')) {
+            // Se não há mais "_" significa que o jogador venceu
+            endGame(true); // Vitória
+        } else if (errorCount >= CONFIG.maxErrors) {
+            // Se o número de erros ultrapassou o limite, o jogador perdeu
+            endGame(false); // Derrota
+        }
+    }
 
     // Se o jogo acabou, mostra todas as letras faltantes
     if (!isGameStart) {
@@ -132,6 +134,7 @@ function displayWord(isGameStart = false) {
         });
     }
 }
+
 
 
 
@@ -174,6 +177,7 @@ function handleLetterInput(letter) {
     displayWord(); // Atualiza a exibição da palavra
     updateWrongLetters(); // Atualiza as letras erradas
 }
+
 
 
 // Finaliza Jogo
