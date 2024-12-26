@@ -32,7 +32,6 @@ const normalizeString = (str) =>
         .replace(/[\u0300-\u036f]/g, '') // Remove diacríticos
         .toUpperCase();
 
-
 const getRandomPage = () => Math.floor(Math.random() * CONFIG.maxPages) + 1;
 
 // Busca Filmes ou Séries
@@ -48,7 +47,9 @@ async function getRandomItem() {
 
         randomItem = normalizeString(category === 'filmes' ? item.title : item.name);
         DOM.movieCover.src = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
-        DOM.movieApproval.textContent = `Popularidade: ${item.popularity.toFixed(1)}`;
+        
+        // Exibindo a classificação do IMDb (vote_average)
+        DOM.movieApproval.textContent = `Classificação: ${item.vote_average.toFixed(1)}`;
 
         // Chame o resetGame após garantir que o randomItem foi configurado corretamente
         if (randomItem && randomItem.length > 0) {
@@ -74,11 +75,14 @@ function adjustWordSpacing() {
     const parentWidth = wordElement.parentElement.offsetWidth;
     const wordWidth = wordElement.scrollWidth;
 
+    // Ajuste para que a palavra não quebre e se ajuste ao tamanho do contêiner
     if (wordWidth > parentWidth) {
         const scalingFactor = parentWidth / wordWidth;
         wordElement.style.fontSize = `${Math.max(1, 2 * scalingFactor)}rem`;
+        wordElement.style.wordWrap = 'break-word'; // Garantir que a palavra se ajuste sem quebrar
     } else {
         wordElement.style.fontSize = '2rem'; // Valor padrão
+        wordElement.style.wordWrap = 'normal'; // Não permitir quebra
     }
 }
 
@@ -160,7 +164,6 @@ function handleLetterInput(letter) {
 }
 
 
-
 // Finaliza Jogo
 function endGame(isVictory) {
     if (!isGameActive) return; // Garante que não será chamada mais de uma vez
@@ -202,8 +205,6 @@ document.addEventListener('keydown', (e) => {
     const letter = e.key.toUpperCase();
     if (/^[A-Z0-9]$/.test(letter)) handleLetterInput(letter);
 });
-
-
 
 
 // Inicializa
