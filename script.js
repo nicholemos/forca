@@ -112,13 +112,12 @@ function displayWord(isGameStart = false) {
     });
 
     DOM.wordContainer.innerHTML = displayed.join(' '); // Junta letras com espaço entre elas
-    checkGameProgress(displayed, isGameStart);
-}
-
-function checkGameProgress(displayed, isGameStart) {
-    if (!isGameStart && isGameActive) { // Verifica se o jogo está ativo
+    if (!isGameStart) {
+        // Se o jogo não está começando, deve mostrar todas as letras não adivinhadas ao final
         if (!displayed.includes('_')) {
             endGame(true); // Vitória
+        } else if (errorCount >= CONFIG.maxErrors) {
+            endGame(false); // Derrota
         }
     }
 }
@@ -173,7 +172,12 @@ function endGame(isVictory) {
     alert(isVictory ? CONFIG.messages.win : CONFIG.messages.lose);
     isVictory ? winCount++ : loseCount++;
     updateScoreboard();
-    displayWord(true);
+
+    // Exibe todas as letras no fim do jogo
+    displayWord(true);  // Aqui mostramos a palavra completa
+
+    // Atualiza as letras erradas
+    updateWrongLetters();
 }
 
 function toggleMovieInfo(show) {
