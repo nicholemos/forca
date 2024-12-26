@@ -107,13 +107,13 @@ function displayWord(isGameStart = false) {
         if (CONFIG.punctuation.includes(letter)) return letter; // Mantém pontuações
         if (letter === ' ') return ' '; // Espaço normal para separação entre palavras
 
-        // Se a letra não foi adivinhada e o jogo acabou, usa a classe 'missing-letter'
-        if (!correctLetters.includes(letter)) {
+        // Se o jogo acabou e a letra não foi adivinhada, usa a classe 'missing-letter'
+        if (errorCount >= CONFIG.maxErrors && !correctLetters.includes(letter)) {
             return `<span class="missing-letter">${letter}</span>`;
         }
 
         // Mostra letras adivinhadas ou '_'
-        return letter;
+        return correctLetters.includes(letter) ? letter : '_';
     });
 
     // Exibe a palavra no contêiner
