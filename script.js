@@ -105,34 +105,26 @@ function resetGame() {
 // Função de verificação e exibição das letras
 function displayWord(isGameStart = false) {
     const displayed = randomItem.split('').map(letter => {
-        if (CONFIG.punctuation.includes(letter)) return letter; // Mantém pontuações
-        if (letter === ' ') return ' '; // Espaço normal para separação entre palavras
+        // Verifica se a letra é pontuação ou espaço
+        if (CONFIG.punctuation.includes(letter)) return letter; 
+        if (letter === ' ') return ' ';
 
-        // Se o jogo acabou e a letra não foi adivinhada, usa a classe 'missing-letter'
-        if (errorCount >= CONFIG.maxErrors && !correctLetters.includes(letter)) {
-            return `<span class="missing-letter">${letter}</span>`;
-        }
-
-        // Verifica se a letra (com ou sem acento) foi adivinhada
+        // Exibe a letra correta ou "_" caso contrário
         if (correctLetters.includes(letter) || correctLetters.includes(normalizeString(letter))) {
-            return letter;  // Exibe a letra correta
+            return letter;
         } else {
-            // Se a letra não foi adivinhada, exibe "_"
             return '_';
         }
     });
 
     // Exibe a palavra no contêiner com espaços entre as letras
-    DOM.wordContainer.innerHTML = displayed.join(' '); // Junta as letras com espaços
+    DOM.wordContainer.innerHTML = displayed.join(' ');
 
     // Verifica se o jogador venceu ou perdeu
     if (!isGameStart) {
-        // Verifica se o jogador completou todas as letras corretamente
         if (!displayed.includes('_')) {
-            // Se não há mais "_" significa que o jogador venceu
             endGame(true); // Vitória
         } else if (errorCount >= CONFIG.maxErrors) {
-            // Se o número de erros ultrapassou o limite, o jogador perdeu
             endGame(false); // Derrota
         }
     }
@@ -158,21 +150,16 @@ function updateWrongLetters() {
 function handleLetterInput(letter) {
     if (!isGameActive || wrongLetters.includes(letter) || correctLetters.includes(letter)) return;
 
-    const normalizedItem = normalizeString(randomItem); // Normaliza o texto do item
+    const normalizedItem = normalizeString(randomItem); // Normaliza o item
     const normalizedLetter = normalizeString(letter); // Normaliza a letra inserida
 
-    // Função para encontrar as letras correspondentes (com ou sem acento)
-    const findMatchingLetters = (normalizedLetter) => {
-        // Encontra todas as letras (acentuadas ou não) que correspondem à versão sem acento
-        return randomItem.split('').filter((originalLetter) => {
-            return normalizeString(originalLetter) === normalizedLetter;
-        });
-    };
-
-    const matchingLetters = findMatchingLetters(normalizedLetter);
+    // Encontra as letras correspondentes (com ou sem acento)
+    const matchingLetters = randomItem.split('').filter((originalLetter) => {
+        return normalizeString(originalLetter) === normalizedLetter;
+    });
 
     if (matchingLetters.length > 0) {
-        // Se a letra normalizada corresponde a uma ou mais letras na palavra (com ou sem acento)
+        // Se a letra normalizada corresponde a uma ou mais letras na palavra
         matchingLetters.forEach(matchingLetter => {
             if (!correctLetters.includes(matchingLetter)) {
                 correctLetters.push(matchingLetter);
