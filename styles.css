@@ -19,16 +19,16 @@ body {
 #word {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 20px; /* Maior espaçamento entre palavras */
     font-size: 2rem;
     text-align: center;
     line-height: 2.5rem;
-    white-space: pre-wrap;
-    letter-spacing: 10px;
+    letter-spacing: 5px; /* Menor espaçamento entre letras */
     overflow: hidden;
     max-width: 100%;
     margin: 0 auto;
 }
+
 
 #wrong-letters {
     margin: 20px 0;
