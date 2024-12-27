@@ -113,8 +113,8 @@ function displayWord(isGameStart = false) {
             return `<span class="missing-letter">${letter}</span>`;
         }
 
-        // Verifica se a letra foi adivinhada
-        if (correctLetters.includes(letter)) {
+        // Verifica se a letra (com ou sem acento) foi adivinhada
+        if (correctLetters.includes(letter) || correctLetters.includes(normalizeString(letter))) {
             return letter;  // Exibe a letra correta
         } else {
             // Se a letra não foi adivinhada, exibe "_"
@@ -140,6 +140,7 @@ function displayWord(isGameStart = false) {
 
 
 
+
 // Manipula Teclado Virtual
 function updateVirtualKeyboard() {
     if (DOM.virtualKeyboard.childNodes.length) return; // Evita recriação
@@ -160,13 +161,37 @@ function handleLetterInput(letter) {
     const normalizedItem = normalizeString(randomItem); // Normaliza o texto do item
     const normalizedLetter = normalizeString(letter); // Normaliza a letra inserida
 
-    // Função para encontrar a letra correspondente (com ou sem acento)
-const findMatchingLetter = (normalizedLetter) => {
-    // Encontra a letra correta (acentuada) correspondente à versão sem acento
-    return randomItem.split('').find((originalLetter) => {
-        return normalizeString(originalLetter) === normalizedLetter;
-    });
+    // Função para encontrar as letras correspondentes (com ou sem acento)
+    const findMatchingLetters = (normalizedLetter) => {
+        // Encontra todas as letras (acentuadas ou não) que correspondem à versão sem acento
+        return randomItem.split('').filter((originalLetter) => {
+            return normalizeString(originalLetter) === normalizedLetter;
+        });
+    };
+
+    const matchingLetters = findMatchingLetters(normalizedLetter);
+
+    if (matchingLetters.length > 0) {
+        // Se a letra normalizada corresponde a uma ou mais letras na palavra (com ou sem acento)
+        matchingLetters.forEach(matchingLetter => {
+            if (!correctLetters.includes(matchingLetter)) {
+                correctLetters.push(matchingLetter);
+            }
+        });
+    } else {
+        // Caso contrário, adiciona a letra às erradas
+        wrongLetters.push(letter);
+        errorCount++;
+        updateErrorImage();
+        if (errorCount >= CONFIG.maxErrors) {
+            endGame(false); // Derrota
+        }
+    }
+
+    displayWord(); // Atualiza a exibição da palavra
+    updateWrongLetters(); // Atualiza as letras erradas
 }
+
 
 
 
