@@ -77,14 +77,14 @@ function adjustWordSpacing() {
 
     // Ajuste para que a palavra não quebre e se ajuste ao tamanho do contêiner
     if (wordWidth > parentWidth) {
-        const scalingFactor = parentWidth / wordWidth;
-        wordElement.style.fontSize = `${Math.max(1, 2 * scalingFactor)}rem`;
         wordElement.style.whiteSpace = 'nowrap'; // Impede que a palavra quebre
+        wordElement.style.fontSize = '1.5rem'; // Reduz o tamanho da fonte, se necessário
     } else {
         wordElement.style.fontSize = '2rem'; // Valor padrão
         wordElement.style.whiteSpace = 'normal'; // Permite que a palavra quebre normalmente
     }
 }
+
 
 
 // Chame essa função sempre que o jogo começar ou reiniciar
@@ -159,12 +159,14 @@ function handleLetterInput(letter) {
     const normalizedItem = normalizeString(randomItem); // Normaliza o texto do item
     const normalizedLetter = normalizeString(letter); // Normaliza a letra inserida
 
-    const findMatchingLetter = (normalizedLetter) => {
-        // Encontra a letra correta (acentuada) correspondente à versão sem acento
-        return randomItem.split('').find((originalLetter) => {
-            return normalizeString(originalLetter) === normalizedLetter;
-        });
-    }
+    // Função para encontrar a letra correspondente (com ou sem acento)
+const findMatchingLetter = (normalizedLetter) => {
+    // Encontra a letra correta (acentuada) correspondente à versão sem acento
+    return randomItem.split('').find((originalLetter) => {
+        return normalizeString(originalLetter) === normalizedLetter;
+    });
+}
+
 
     const matchingLetter = findMatchingLetter(normalizedLetter);
 
