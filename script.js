@@ -28,9 +28,9 @@ let errorCount = 0, winCount = 0, loseCount = 0, isGameActive = true;
 
 // Funções Utilitárias
 const normalizeString = (str) =>
-    str.normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacríticos
-        .toUpperCase();
+    str.normalize('NFD') // Normaliza os caracteres
+        .replace(/[\u0300-\u036f]/g, '') // Remove os acentos e outros diacríticos
+        .toUpperCase(); // Converte para maiúsculas
 
 const getRandomPage = () => Math.floor(Math.random() * CONFIG.maxPages) + 1;
 
@@ -122,7 +122,7 @@ function displayWord(isGameStart = false) {
         }
     });
 
-    // Exibe a palavra no contêiner
+    // Exibe a palavra no contêiner com espaços entre as letras
     DOM.wordContainer.innerHTML = displayed.join(' '); // Junta as letras com espaços
 
     // Verifica se o jogador venceu ou perdeu
@@ -137,6 +137,7 @@ function displayWord(isGameStart = false) {
         }
     }
 }
+
 
 
 // Manipula Teclado Virtual
@@ -166,6 +167,7 @@ const findMatchingLetter = (normalizedLetter) => {
         return normalizeString(originalLetter) === normalizedLetter;
     });
 }
+
 
 
     const matchingLetter = findMatchingLetter(normalizedLetter);
