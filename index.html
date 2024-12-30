@@ -5,62 +5,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo da Forca</title>
+    <!-- Link do Bootstrap 4 (CDN) -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>Jogo da Forca</h1>
-        <label>Escolha uma categoria:</label><br>
-
-        <div>
-            <input type="radio" id="filmes" name="category" value="filmes" checked>
-            <label for="filmes">Filmes</label>
-        </div>
+        <h1 class="text-center my-4">Jogo da Forca</h1>
         
-        <div>
-            <input type="radio" id="series" name="category" value="series">
-            <label for="series">Séries</label>
+        <div class="form-group">
+            <label>Escolha uma categoria:</label><br>
+            <div>
+                <input type="radio" id="filmes" name="category" value="filmes" checked>
+                <label for="filmes">Filmes</label>
+            </div>
+            <div>
+                <input type="radio" id="series" name="category" value="series">
+                <label for="series">Séries</label>
+            </div>
         </div>
-        
-
         
         <!-- Contadores de vitórias e derrotas -->
-        <div id="score-board">
-                <p>Vitórias: <span id="win-count">0</span></p>
-                <p>Derrotas: <span id="lose-count">0</span></p>
+        <div id="score-board" class="my-3">
+            <p>Vitórias: <span id="win-count">0</span></p>
+            <p>Derrotas: <span id="lose-count">0</span></p>
         </div>
-        
-        <div class="game-info">
+
+        <div class="game-info mb-3">
             <div id="error-image-box" class="box">
-                <img id="error-image" src="0erro.png" alt="Imagem de erros" />
+                <img id="error-image" src="0erro.png" alt="Imagem de erros" class="img-fluid" />
             </div>
             <div id="movie-info-box" class="box">
-                <img id="movie-cover" src="" alt="Capa do filme" style="display: none;" />
-                <p id="movie-approval" style="display: none;"></p>
+                <img id="movie-cover" src="" alt="Capa do filme" class="img-fluid d-none" />
+                <p id="movie-approval" class="d-none"></p>
             </div>
         </div>
+
         <p id="description">Adivinhe o nome!</p>
-        <div id="forca-container">
-            <div id="word"></div>
+
+        <div id="forca-container" class="mb-3">
+            <div id="word" class="display-4"></div>
         </div>
 
-        <div id="wrong-letters">
+        <div id="wrong-letters" class="mb-3">
             <p>Letras erradas:</p>
-            <span id="wrong-letters-span"></span>
+            <span id="wrong-letters-span" class="font-weight-bold text-danger"></span>
         </div>
+
         <div id="keyboard">
             <p>Digite ou clique nas letras abaixo:</p>
-            <div id="virtual-keyboard"></div>
+            <div id="virtual-keyboard" class="btn-group-vertical"></div>
         </div>
 
-        
-
-        <button id="reset-button">Recomeçar Jogo</button>
-
-        
+        <button id="reset-button" class="btn btn-danger mt-3">Recomeçar Jogo</button>
     </div>
+
     <script src="script.js"></script>
+    <!-- Script do Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
