@@ -26,7 +26,8 @@ const DOM = {
 let randomItem = '', correctLetters = [], wrongLetters = [], errorCount = 0, isGameActive = true;
 let winCount = 0, loseCount = 0;
 
-const normalizeString = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+// Função para normalizar o texto (remover acentos)
+const removeAccents = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 const getRandomPage = () => Math.floor(Math.random() * CONFIG.maxPages) + 1;
 
@@ -36,11 +37,11 @@ async function getRandomItem() {
         const apiUrl = `https://api.themoviedb.org/3/${category === 'filmes' ? 'movie/popular' : 'tv/popular'}?api_key=${apiKey}&language=pt-BR&page=${getRandomPage()}`;
         const { results } = await fetch(apiUrl).then(res => res.json());
         const item = results[Math.floor(Math.random() * results.length)];
-        
+
         randomItem = item.title || item.name;
         DOM.movieCover.src = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
         DOM.movieApproval.textContent = `Classificação: ${item.vote_average.toFixed(1)}`;
-        
+
         resetGame();
     } catch (error) {
         console.error(error);
@@ -66,34 +67,51 @@ function updateUI() {
 
 function displayWord(isGameStart = false) {
     const displayed = randomItem.split('').map(letter => {
-        letter = letter.toUpperCase();
+        const normalizedLetter = letter.toUpperCase();
 
-        if (CONFIG.punctuation.includes(letter)) return letter;
+        if (CONFIG.punctuation.includes(normalizedLetter)) return letter;
         if (letter === ' ') return '&nbsp;';
 
-        if (errorCount >= CONFIG.maxErrors && !correctLetters.includes(letter)) {
-            return `<span class="missing-letter">${letter}</span>`;
-        }
+        // Verifica se a letra foi adivinhada
+        const isCorrect = correctLetters.some(correctLetter => {
+            return getLetterVariants(correctLetter).includes(normalizedLetter);
+        });
 
-        if (correctLetters.includes(letter)) {
-            return letter;
+        if (isCorrect) {
+            return `<span class="correct-letter">${letter}</span>`;
         } else {
+            // Se for uma derrota e a letra não foi adivinhada, colore a letra de vermelho
+            if (errorCount >= CONFIG.maxErrors) {
+                return `<span class="incorrect-letter">${letter}</span>`;
+            }
             return '_';
         }
     });
 
-    DOM.wordContainer.innerHTML = displayed.join('');
+    DOM.wordContainer.innerHTML = displayed.join(''); 
 
     if (!isGameStart) {
-        // Verifique se o jogador perdeu antes de verificar se ele venceu
         if (errorCount >= CONFIG.maxErrors) {
-            endGame(false); // Derrota: número máximo de erros foi atingido
+            endGame(false); // Derrota
         } else if (!displayed.includes('_')) {
-            endGame(true); // Vitória: todas as letras foram adivinhadas
+            endGame(true); // Vitória
         }
     }
 }
 
+
+function getLetterVariants(letter) {
+    const variants = {
+        'A': ['A', 'Á', 'À', 'Ã', 'Â'],
+        'E': ['E', 'É', 'Ê'],
+        'I': ['I', 'Í'],
+        'O': ['O', 'Ó', 'Ô', 'Õ'],
+        'U': ['U', 'Ú', 'Û'],
+        'C': ['C', 'Ç'],
+    };
+    
+    return variants[letter] || [letter]; 
+}
 
 function updateWrongLetters() {
     DOM.wrongLettersSpan.textContent = wrongLetters.join(', ');
@@ -102,12 +120,13 @@ function updateWrongLetters() {
 function handleLetterInput(letter) {
     if (!isGameActive || wrongLetters.includes(letter) || correctLetters.includes(letter)) return;
 
-    const matchingLetter = findMatchingLetter(letter);
+    const normalizedLetter = letter.toUpperCase();
+    const matchingLetter = findMatchingLetter(normalizedLetter);
 
     if (matchingLetter) {
         correctLetters.push(matchingLetter);
     } else {
-        wrongLetters.push(letter);
+        wrongLetters.push(normalizedLetter);
         errorCount++;
     }
 
@@ -115,15 +134,10 @@ function handleLetterInput(letter) {
 }
 
 function findMatchingLetter(letter) {
-    const normalizedLetter = normalizeString(letter); // Normaliza a letra digitada
-
-    // Encontra a letra correta (acentuada) correspondente à versão sem acento
-    return randomItem.split('').some(originalLetter => {
-        return normalizeString(originalLetter) === normalizedLetter;
-    }) ? letter : null;
+    const variants = getLetterVariants(letter);
+    const normalizedRandomItem = randomItem.toUpperCase();
+    return variants.find(variant => normalizedRandomItem.includes(variant)) || null;
 }
-
-
 
 function updateErrorImage() {
     DOM.errorImage.src = `${errorCount}erro.png`;
@@ -139,17 +153,59 @@ function endGame(isVictory) {
     if (!isGameActive) return;
     isGameActive = false;
 
+    // Exibe a capa e a nota do filme
     toggleMovieInfo(true);
+
+    // Exibe a mensagem de vitória ou derrota
     alert(isVictory ? CONFIG.messages.win : CONFIG.messages.lose);
-    isVictory ? winCount++ : loseCount++;
+
+    // Atualiza o placar
+    if (isVictory) {
+        winCount++;
+    } else {
+        loseCount++;
+    }
     updateScoreboard();
-    displayWord(); // Atualiza o estado final do jogo
+
+    // Completa as letras restantes
+    completeRemainingLetters();
 }
 
+DOM.resetButton.addEventListener('click', () => {
+    getRandomItem();  // Carrega um novo filme
+    toggleMovieInfo(false);  // Esconde a capa e a nota do filme antes de recomeçar
+});
+
+
+
 function toggleMovieInfo(show) {
-    DOM.movieCover.style.display = show ? 'block' : 'none';
-    DOM.movieApproval.style.display = show ? 'block' : 'none';
+    if (show) {
+        DOM.movieCover.classList.remove('d-none');
+        DOM.movieApproval.classList.remove('d-none');
+    } else {
+        DOM.movieCover.classList.add('d-none');
+        DOM.movieApproval.classList.add('d-none');
+    }
 }
+
+
+
+function completeRemainingLetters() {
+    randomItem.split('').forEach(letter => {
+        if (!correctLetters.includes(letter.toUpperCase()) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
+            const variants = getLetterVariants(letter.toUpperCase());
+            variants.forEach(variant => {
+                if (!correctLetters.includes(variant)) {
+                    correctLetters.push(variant);
+                }
+            });
+        }
+    });
+
+    // Atualiza a exibição com as letras completas (no caso da derrota, letras erradas serão vermelhas)
+    updateUI();
+}
+
 
 function updateScoreboard() {
     DOM.winCount.textContent = winCount;
@@ -165,15 +221,17 @@ document.querySelectorAll('input[name="category"]').forEach(input =>
     input.addEventListener('change', handleCategoryChange)
 );
 
-DOM.resetButton.addEventListener('click', getRandomItem);
+DOM.resetButton.addEventListener('click', () => {
+    getRandomItem();  // Carrega um novo filme
+    toggleMovieInfo(false);  // Esconde a capa e a nota do filme antes de recomeçar
+});
+
+
 document.addEventListener('keydown', e => {
-    const letter = e.key.toUpperCase(); // Convertendo a letra digitada para maiúscula
-    if (/^[A-Z0-9]$/.test(letter)) { // Apenas processa se for uma letra ou número
+    const letter = e.key.toUpperCase(); 
+    if (/^[A-Z0-9]$/.test(letter)) {
         handleLetterInput(letter);
     }
 });
 
-
 getRandomItem();
-
-//https://onecompiler.com/html/434b4avnp
