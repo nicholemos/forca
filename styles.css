@@ -181,3 +181,8 @@ body {
 #score-board span {
     color: #007bff;
 }
+
+#error-image {
+    width: 150%; /* Aumenta a largura para 120% do tamanho original */
+    height: auto; /* Mantém a proporção da altura */
+}
