@@ -1,115 +1,113 @@
-/* Estilos gerais */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
+/* Reset de margens, padding e box-sizing */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Usando uma fonte mais moderna */
+    background-color: #f2f2f2;
 }
 
 .container {
     max-width: 800px;
-    margin: 50px auto;
+    margin: 20px auto;
+    text-align: center;
     padding: 20px;
-    background-color: #fff;
+    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo da palavra */
-#word {
-    display: inline-flex; /* Usamos inline-flex para manter as palavras juntas */
-    justify-content: center;
-    font-size: 4rem;
-    gap: 10px; /* Controla o espaçamento entre as palavras */
-    letter-spacing: 3px; /* Ajuste o espaçamento entre as letras */
-}
-
-/* Letras erradas */
-#wrong-letters {
-    margin: 20px 0;
-    color: red;
-}
-
-/* Teclado virtual */
-#letter-buttons, #virtual-keyboard {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-button {
-    padding: 10px 15px;
-    font-size: 18px;
+#keyboard button,
+#virtual-keyboard button {
+    font-size: 20px;
+    padding: 10px;
     cursor: pointer;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    background: #007bff;
-    color: white;
-    transition: transform 0.2s, background 0.3s;
-}
-
-button:hover {
-    transform: scale(1.1);
-    background: #0056b3;
-}
-
-button:active {
-    transform: scale(0.95);
-    background: #003d82;
-}
-
-/* Botão de reset */
-#reset-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
+    background-color: #61a2ff;
     border: none;
     border-radius: 5px;
+    color: white;
+    margin: 5px;
+    transition: background-color 0.3s;
 }
 
-#reset-button:hover {
-    background-color: #218838;
+#keyboard button:hover,
+#virtual-keyboard button:hover {
+    background-color: #4e8ad5;
 }
 
-/* Informações do jogo */
-.game-info {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
+#keyboard button:active,
+#virtual-keyboard button:active {
+    background-color: #3e74b4;
+}
+
+#keyboard button:disabled,
+#virtual-keyboard button:disabled {
+    background-color: #dcdcdc;
+    cursor: not-allowed;
+}
+
+#word {
+    font-size: 40px;
+    letter-spacing: 10px;
+    font-weight: bold;
+    color: black;
+}
+
+#forca-container {
+    font-size: 30px;
+    margin-top: 20px;
 }
 
 .box {
-    width: 45%;
+    margin: 20px 0;
 }
 
-/* Imagens */
-#movie-cover, #error-image {
-    max-width: 100%;
-    height: auto;
+#movie-cover {
+    max-width: 200px;
+    margin-bottom: 10px;
 }
 
-/* Letras erradas */
-.missing-letter {
+#error-image {
+    max-width: 200px;
+    margin-top: 20px;
+}
+
+#score-board p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+#wrong-letters-span {
+    font-size: 24px;
+    font-weight: bold;
+    color: red;
+}
+
+#virtual-keyboard {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    justify-content: center;
+}
+
+#reset-button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+#reset-button:hover {
+    background-color: #ff6666;
+}
+
+.incorrect-letter {
     color: red;
     font-weight: bold;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .box {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    #word {
-        font-size: 2rem; /* Ajusta o tamanho da fonte para telas menores */
-    }
-
-    button {
-        font-size: 16px;
-        padding: 8px 12px;
-    }
 }
