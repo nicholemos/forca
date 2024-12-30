@@ -108,6 +108,65 @@ body {
 }
 
 .incorrect-letter {
-    color: red;
+    color: #e74c3c;  /* Vermelho */
+    font-weight: bold; /* Para tornar as letras mais visíveis */
+}
+
+/* Estilo para o formulário de escolha de categoria */
+.form-group {
+    background-color: #f7f7f7; /* Cor de fundo suave */
+    padding: 10px 15px; /* Menos espaçamento interno */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+    margin-bottom: 15px; /* Menos espaçamento entre as caixas */
+    max-width: 300px; /* Limita a largura máxima */
+    margin: 0 auto; /* Centraliza a caixa */
+}
+
+.form-group label {
+    font-size: 1.1em; /* Tamanho um pouco menor para o título */
     font-weight: bold;
+    color: #333; /* Cor escura para o texto */
+}
+
+.form-group div {
+    margin: 8px 0; /* Espaçamento reduzido entre as opções */
+}
+
+.form-group input[type="radio"] {
+    accent-color: #007bff; /* Cor azul para o botão de opção */
+    margin-right: 8px; /* Espaçamento à direita do botão */
+}
+
+.form-group input[type="radio"]:checked + label {
+    color: #007bff; /* Cor do texto quando o radio é selecionado */
+}
+
+.form-group label {
+    cursor: pointer; /* Cursor de pointer para interatividade */
+    transition: color 0.3s ease; /* Transição suave para a mudança de cor */
+}
+
+/* Estilo para o scoreboard (contadores de vitórias/derrotas) */
+#score-board {
+    background-color: #ffffff; /* Cor de fundo branca */
+    padding: 10px 15px; /* Menos espaçamento interno */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+    display: flex;
+    justify-content: space-between; /* Distribui o conteúdo uniformemente */
+    align-items: center; /* Alinha os itens ao centro verticalmente */
+    font-size: 1em; /* Tamanho de fonte menor */
+    font-weight: bold; /* Texto em negrito */
+    max-width: 300px; /* Limita a largura máxima */
+    margin: 0 auto; /* Centraliza a caixa */
+}
+
+#score-board p {
+    margin: 0; /* Remove a margem do parágrafo */
+    color: #333; /* Cor escura para o texto */
+}
+
+#score-board span {
+    color: #007bff; /* Cor azul para o número de vitórias */
 }
