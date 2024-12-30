@@ -188,46 +188,6 @@ function toggleMovieInfo(show) {
     }
 }
 
-
-
-function completeRemainingLetters() {
-    const displayedLetters = randomItem.split('').map(letter => {
-        const normalizedLetter = letter.toUpperCase();
-
-        if (!correctLetters.includes(normalizedLetter) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
-            // Completa a letra errada com base nas variantes
-            const variants = getLetterVariants(letter.toUpperCase());
-            variants.forEach(variant => {
-                if (!correctLetters.includes(variant)) {
-                    correctLetters.push(variant);
-                }
-            });
-        }
-
-        // Verifica se a letra é errada e deve ser exibida em vermelho
-        if (wrongLetters.includes(normalizedLetter)) {
-            return `<span class="incorrect-letter">${letter}</span>`;
-        }
-
-        // Se a letra for uma das que o jogador não adivinhou e o número de erros for atingido, a letra aparece em vermelho
-        if (errorCount >= CONFIG.maxErrors && !correctLetters.includes(normalizedLetter) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
-            return `<span class="incorrect-letter">${letter}</span>`;
-        }
-
-        // Exibe as letras corretamente adivinhadas
-        if (correctLetters.some(correctLetter => getLetterVariants(correctLetter).includes(normalizedLetter))) {
-            return `<span class="correct-letter">${letter}</span>`;
-        }
-
-        return '_';
-    });
-
-    DOM.wordContainer.innerHTML = displayedLetters.join(''); 
-
-    updateUI();
-}
-
-
 function updateScoreboard() {
     // Atualiza o contador de vitórias
     DOM.winCount.textContent = winCount;
@@ -260,5 +220,26 @@ document.addEventListener('keydown', e => {
         handleLetterInput(letter);
     }
 });
+
+function completeRemainingLetters() {
+    // Só exibe as letras não adivinhadas ao perder o jogo
+    if (errorCount >= CONFIG.maxErrors) {
+        const displayedLetters = randomItem.split('').map(letter => {
+            const normalizedLetter = letter.toUpperCase();
+
+            // Se a letra não foi adivinhada corretamente, exibe a letra
+            if (!correctLetters.includes(normalizedLetter) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
+                return `<span class="incorrect-letter">${letter}</span>`;
+            }
+
+            // Caso contrário, não altera a letra
+            return letter;
+        });
+
+        // Atualiza o conteúdo da palavra no DOM com as letras que faltaram
+        DOM.wordContainer.innerHTML = displayedLetters.join('');
+    }
+}
+
 
 getRandomItem();
