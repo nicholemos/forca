@@ -77,15 +77,16 @@ function displayWord(isGameStart = false) {
             return getLetterVariants(correctLetter).includes(normalizedLetter);
         });
 
+        // Verifica se a letra foi errada e deve ser exibida em vermelho
+        if (wrongLetters.includes(normalizedLetter) && !isCorrect) {
+            return `<span class="incorrect-letter">${letter}</span>`;
+        }
+
         if (isCorrect) {
             return `<span class="correct-letter">${letter}</span>`;
-        } else {
-            // Se for uma derrota e a letra não foi adivinhada, colore a letra de vermelho
-            if (errorCount >= CONFIG.maxErrors) {
-                return `<span class="incorrect-letter">${letter}</span>`;
-            }
-            return '_';
         }
+
+        return '_';
     });
 
     DOM.wordContainer.innerHTML = displayed.join(''); 
@@ -98,7 +99,6 @@ function displayWord(isGameStart = false) {
         }
     }
 }
-
 
 function getLetterVariants(letter) {
     const variants = {
@@ -191,8 +191,11 @@ function toggleMovieInfo(show) {
 
 
 function completeRemainingLetters() {
-    randomItem.split('').forEach(letter => {
-        if (!correctLetters.includes(letter.toUpperCase()) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
+    const displayedLetters = randomItem.split('').map(letter => {
+        const normalizedLetter = letter.toUpperCase();
+
+        if (!correctLetters.includes(normalizedLetter) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
+            // Completa a letra errada com base nas variantes
             const variants = getLetterVariants(letter.toUpperCase());
             variants.forEach(variant => {
                 if (!correctLetters.includes(variant)) {
@@ -200,16 +203,40 @@ function completeRemainingLetters() {
                 }
             });
         }
+
+        // Verifica se a letra é errada e deve ser exibida em vermelho
+        if (wrongLetters.includes(normalizedLetter)) {
+            return `<span class="incorrect-letter">${letter}</span>`;
+        }
+
+        // Se a letra for uma das que o jogador não adivinhou e o número de erros for atingido, a letra aparece em vermelho
+        if (errorCount >= CONFIG.maxErrors && !correctLetters.includes(normalizedLetter) && !CONFIG.punctuation.includes(letter) && letter !== ' ') {
+            return `<span class="incorrect-letter">${letter}</span>`;
+        }
+
+        // Exibe as letras corretamente adivinhadas
+        if (correctLetters.some(correctLetter => getLetterVariants(correctLetter).includes(normalizedLetter))) {
+            return `<span class="correct-letter">${letter}</span>`;
+        }
+
+        return '_';
     });
 
-    // Atualiza a exibição com as letras completas (no caso da derrota, letras erradas serão vermelhas)
+    DOM.wordContainer.innerHTML = displayedLetters.join(''); 
+
     updateUI();
 }
 
 
 function updateScoreboard() {
+    // Atualiza o contador de vitórias
     DOM.winCount.textContent = winCount;
+    
+    // Atualiza o contador de derrotas
     DOM.loseCount.textContent = loseCount;
+
+    // Aplica a cor vermelha ao contador de derrotas
+    DOM.loseCount.style.color = '#e74c3c';  // Cor vermelha
 }
 
 function handleCategoryChange() {
