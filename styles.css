@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Usando uma fonte mais moderna */
+    font-family: 'Roboto', sans-serif;
     background-color: #f2f2f2;
 }
 
@@ -22,25 +22,28 @@ body {
 
 #keyboard button,
 #virtual-keyboard button {
-    font-size: 20px;
-    padding: 10px;
+    font-size: 20px;  /* Diminuir o tamanho da fonte das teclas */
+    padding: 10px 15px;  /* Diminuir o padding */
     cursor: pointer;
     background-color: #61a2ff;
     border: none;
     border-radius: 5px;
     color: white;
-    margin: 5px;
+    margin: 3px;  /* Diminuir a margem entre as teclas */
     transition: background-color 0.3s;
 }
 
 #keyboard button:hover,
 #virtual-keyboard button:hover {
     background-color: #4e8ad5;
+    transform: scale(1.1); /* Aumenta o tamanho em 10% */
+    transition: transform 0.2s ease; /* Suaviza a animação de aumento */
 }
 
 #keyboard button:active,
 #virtual-keyboard button:active {
     background-color: #3e74b4;
+   
 }
 
 #keyboard button:disabled,
@@ -54,6 +57,8 @@ body {
     letter-spacing: 10px;
     font-weight: bold;
     color: black;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 #forca-container {
@@ -86,17 +91,21 @@ body {
     color: red;
 }
 
+/* Estilo para o teclado virtual */
 #virtual-keyboard {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 5px;
+    grid-template-columns: repeat(10, 1fr);  /* Pode ajustar para 10 teclas por linha */
+    gap: 3px;  /* Diminuir o espaço entre as teclas */
     justify-content: center;
+    max-width: 400px;  /* Limitar a largura do teclado */
+    margin: 0 auto;  /* Centralizar o teclado */
 }
 
+/* Estilo para o botão de reset */
 #reset-button {
     padding: 10px 20px;
     font-size: 18px;
-    background-color: #ff4d4d;
+    background-color: green;
     border: none;
     border-radius: 5px;
     color: white;
@@ -104,69 +113,71 @@ body {
 }
 
 #reset-button:hover {
-    background-color: #ff6666;
+    background-color: darkgreen;
+    transform: scale(1.1); /* Aumenta o tamanho em 10% */
+    transition: transform 0.2s ease; /* Suaviza a animação de aumento */
 }
 
 .incorrect-letter {
-    color: #e74c3c;  /* Vermelho */
-    font-weight: bold; /* Para tornar as letras mais visíveis */
+    color: #e74c3c;
+    font-weight: bold;    
 }
 
 /* Estilo para o formulário de escolha de categoria */
 .form-group {
-    background-color: #f7f7f7; /* Cor de fundo suave */
-    padding: 10px 15px; /* Menos espaçamento interno */
-    border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
-    margin-bottom: 15px; /* Menos espaçamento entre as caixas */
-    max-width: 300px; /* Limita a largura máxima */
-    margin: 0 auto; /* Centraliza a caixa */
+    background-color: #f7f7f7;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .form-group label {
-    font-size: 1.1em; /* Tamanho um pouco menor para o título */
+    font-size: 1.1em;
     font-weight: bold;
-    color: #333; /* Cor escura para o texto */
+    color: #333;
 }
 
 .form-group div {
-    margin: 8px 0; /* Espaçamento reduzido entre as opções */
+    margin: 8px 0;
 }
 
 .form-group input[type="radio"] {
-    accent-color: #007bff; /* Cor azul para o botão de opção */
-    margin-right: 8px; /* Espaçamento à direita do botão */
+    accent-color: #007bff;
+    margin-right: 8px;
 }
 
 .form-group input[type="radio"]:checked + label {
-    color: #007bff; /* Cor do texto quando o radio é selecionado */
+    color: #007bff;
 }
 
 .form-group label {
-    cursor: pointer; /* Cursor de pointer para interatividade */
-    transition: color 0.3s ease; /* Transição suave para a mudança de cor */
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 /* Estilo para o scoreboard (contadores de vitórias/derrotas) */
 #score-board {
-    background-color: #ffffff; /* Cor de fundo branca */
-    padding: 10px 15px; /* Menos espaçamento interno */
-    border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+    background-color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: space-between; /* Distribui o conteúdo uniformemente */
-    align-items: center; /* Alinha os itens ao centro verticalmente */
-    font-size: 1em; /* Tamanho de fonte menor */
-    font-weight: bold; /* Texto em negrito */
-    max-width: 300px; /* Limita a largura máxima */
-    margin: 0 auto; /* Centraliza a caixa */
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    font-weight: bold;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 #score-board p {
-    margin: 0; /* Remove a margem do parágrafo */
-    color: #333; /* Cor escura para o texto */
+    margin: 0;
+    color: #333;
 }
 
 #score-board span {
-    color: #007bff; /* Cor azul para o número de vitórias */
+    color: #007bff;
 }
