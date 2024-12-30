@@ -3,7 +3,7 @@ const CONFIG = {
     maxErrors: 5,
     maxPages: 500,
     allowedChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-    punctuation: [',', '.', ';', ':', '!', '?', '-'],
+    punctuation: [',', '.', ';', ':', '!', '?', '-', "'"],
     messages: {
         win: 'Parabéns! Você venceu!',
         lose: 'Você perdeu! Veja o filme:',
