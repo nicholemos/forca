@@ -94,11 +94,12 @@ body {
 /* Estilo para o teclado virtual */
 #virtual-keyboard {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);  /* Pode ajustar para 10 teclas por linha */
+    grid-template-columns: repeat(10, 1fr);  /* Até 10 teclas por linha */
     gap: 3px;  /* Diminuir o espaço entre as teclas */
     justify-content: center;
-    max-width: 400px;  /* Limitar a largura do teclado */
+    max-width: 90%;  /* Limitar a largura do teclado em 90% da tela */
     margin: 0 auto;  /* Centralizar o teclado */
+    overflow-x: auto; /* Adiciona rolagem horizontal se necessário */
 }
 
 /* Estilo para o botão de reset */
@@ -185,4 +186,23 @@ body {
 #error-image {
     width: 150%; /* Aumenta a largura para 120% do tamanho original */
     height: auto; /* Mantém a proporção da altura */
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 768px) {
+    #virtual-keyboard {
+        grid-template-columns: repeat(7, 1fr);  /* 7 teclas por linha */
+        max-width: 100%;  /* Largura máxima de 100% da tela */
+    }
+}
+
+@media (max-width: 480px) {
+    #virtual-keyboard {
+        grid-template-columns: repeat(5, 1fr);  /* 5 teclas por linha em telas menores */
+    }
+
+    #keyboard button {
+        font-size: 16px;  /* Reduzir o tamanho da fonte em telas pequenas */
+        padding: 8px 10px;  /* Ajustar o padding para telas menores */
+    }
 }
