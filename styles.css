@@ -206,3 +206,21 @@ body {
         padding: 8px 10px;  /* Ajustar o padding para telas menores */
     }
 }
+
+/* Letras desabilitadas no teclado */
+#keyboard button.disabled,
+#virtual-keyboard button.disabled {
+    background-color: #d3d3d3 !important; /* Força a cor de fundo */
+    cursor: not-allowed !important; /* Garante que o cursor fique como 'não permitido' */
+    color: #B0B0B0 !important; /* Garante que a cor do texto seja cinza */
+    transform: none; /* Não altera o tamanho do botão quando a letra está desabilitada */
+}
+
+/* Remover o efeito hover nas letras desabilitadas */
+#keyboard button.disabled:hover,
+#virtual-keyboard button.disabled:hover {
+    background-color: #d3d3d3 !important; /* Mantém o fundo cinza no hover */
+    transform: none; /* Nenhuma transformação (sem aumento de tamanho) */
+    cursor: not-allowed !important; /* Cursor permanece como 'não permitido' */
+}
+
