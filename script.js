@@ -4,6 +4,7 @@ const CONFIG = {
     maxPages: 500,
     allowedChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
     punctuation: [',', '.', ';', ':', '!', '?', '-', "'"],
+    validLanguages: ['pt', 'en', 'es', 'fr', 'it', 'de', 'nl', 'pl'],  // Idiomas ocidentais
     messages: {
         win: 'Parabéns! Você venceu!',
         lose: 'Você perdeu! Veja o filme:',
@@ -23,6 +24,24 @@ const DOM = {
     virtualKeyboard: document.getElementById('virtual-keyboard'),
 };
 
+// Áudio de clique
+function playButtonSound() {
+    const sound = document.getElementById('button-sound');
+    sound.play();
+}
+
+// Áudio de erro
+function playErrorSound() {
+    const errorSound = document.getElementById('error-sound');
+    errorSound.play();
+}
+
+// Áudio de vitória
+function playVictorySound() {
+    const victorySound = document.getElementById('victory-sound');
+    victorySound.play();
+}
+
 let randomItem = '', correctLetters = [], wrongLetters = [], errorCount = 0, isGameActive = true;
 let winCount = 0, loseCount = 0;
 
@@ -36,7 +55,18 @@ async function getRandomItem() {
         const category = document.querySelector('input[name="category"]:checked').value;
         const apiUrl = `https://api.themoviedb.org/3/${category === 'filmes' ? 'movie/popular' : 'tv/popular'}?api_key=${apiKey}&language=pt-BR&page=${getRandomPage()}`;
         const { results } = await fetch(apiUrl).then(res => res.json());
-        const item = results[Math.floor(Math.random() * results.length)];
+
+        // Filtra os filmes/séries com idiomas válidos
+        const validResults = results.filter(item => {
+            return item.original_language && CONFIG.validLanguages.includes(item.original_language);
+        });
+
+        if (validResults.length === 0) {
+            alert('Não há filmes/séries válidos no momento.');
+            return;
+        }
+
+        const item = validResults[Math.floor(Math.random() * validResults.length)];
 
         randomItem = item.title || item.name;
         DOM.movieCover.src = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
@@ -118,10 +148,8 @@ function updateWrongLetters() {
 }
 
 function handleLetterInput(letter) {
+    playButtonSound(); // Toca o som de clique
     if (!isGameActive || wrongLetters.includes(letter) || correctLetters.includes(letter)) return;
-
-    // Toca o som da tecla
-    playKeySound();
 
     const normalizedLetter = letter.toUpperCase();
     const matchingLetter = findMatchingLetter(normalizedLetter);
@@ -131,11 +159,11 @@ function handleLetterInput(letter) {
     } else {
         wrongLetters.push(normalizedLetter);
         errorCount++;
+        playErrorSound(); // Toca o som de erro quando o jogador erra
     }
 
     updateUI();
 }
-
 
 function findMatchingLetter(letter) {
     const variants = getLetterVariants(letter);
@@ -148,10 +176,21 @@ function updateErrorImage() {
 }
 
 function updateVirtualKeyboard() {
-    DOM.virtualKeyboard.innerHTML = CONFIG.allowedChars.split('').map(char =>
-        `<button onclick="handleLetterInput('${char}')">${char}</button>`
-    ).join('');
+    console.log("Atualizando o teclado virtual...");
+
+    DOM.virtualKeyboard.innerHTML = CONFIG.allowedChars.split('').map(char => {
+        const disabledClass = correctLetters.includes(char) || wrongLetters.includes(char) ? 'disabled' : '';
+        console.log(char, disabledClass); // Verifica se a classe 'disabled' está sendo aplicada corretamente
+        return `<button class="${disabledClass}" onclick="handleLetterInput('${char}')">${char}</button>`;
+    }).join('');
 }
+
+// Áudio de derrota
+function playLoseSound() {
+    const loseSound = document.getElementById('lose-sound');
+    loseSound.play();
+}
+
 
 function endGame(isVictory) {
     if (!isGameActive) return;
@@ -162,6 +201,13 @@ function endGame(isVictory) {
 
     // Exibe a mensagem de vitória ou derrota
     alert(isVictory ? CONFIG.messages.win : CONFIG.messages.lose);
+
+    // Toca o som de vitória ou derrota
+    if (isVictory) {
+        playVictorySound();
+    } else {
+        playLoseSound(); // Toca o som de derrota
+    }
 
     // Atualiza o placar
     if (isVictory) {
@@ -175,12 +221,12 @@ function endGame(isVictory) {
     completeRemainingLetters();
 }
 
+
 DOM.resetButton.addEventListener('click', () => {
+    playButtonSound(); // Toca o som de clique
     getRandomItem();  // Carrega um novo filme
     toggleMovieInfo(false);  // Esconde a capa e a nota do filme antes de recomeçar
 });
-
-
 
 function toggleMovieInfo(show) {
     if (show) {
@@ -212,17 +258,11 @@ document.querySelectorAll('input[name="category"]').forEach(input =>
     input.addEventListener('change', handleCategoryChange)
 );
 
-DOM.resetButton.addEventListener('click', () => {
-    getRandomItem();  // Carrega um novo filme
-    toggleMovieInfo(false);  // Esconde a capa e a nota do filme antes de recomeçar
-});
-
-
 document.addEventListener('keydown', e => {
-    const letter = e.key.toUpperCase(); 
+    const letter = e.key.toUpperCase();
     if (/^[A-Z0-9]$/.test(letter)) {
+        playButtonSound(); // Toca o som de clique
         handleLetterInput(letter);
-        playKeySound(); // Toca o som quando a tecla é pressionada
     }
 });
 
@@ -246,13 +286,6 @@ function completeRemainingLetters() {
     }
 }
 
-function playKeySound() {
-    const keySound = document.getElementById('key-sound');
-    keySound.currentTime = 0; // Reseta a reprodução do áudio
-    keySound.play();
-}
-
-
-
-
 getRandomItem();
+
+alert(`Letra: ${char}, Classe: ${disabledClass}`);
