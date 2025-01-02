@@ -120,6 +120,9 @@ function updateWrongLetters() {
 function handleLetterInput(letter) {
     if (!isGameActive || wrongLetters.includes(letter) || correctLetters.includes(letter)) return;
 
+    // Toca o som da tecla
+    playKeySound();
+
     const normalizedLetter = letter.toUpperCase();
     const matchingLetter = findMatchingLetter(normalizedLetter);
 
@@ -132,6 +135,7 @@ function handleLetterInput(letter) {
 
     updateUI();
 }
+
 
 function findMatchingLetter(letter) {
     const variants = getLetterVariants(letter);
@@ -218,6 +222,7 @@ document.addEventListener('keydown', e => {
     const letter = e.key.toUpperCase(); 
     if (/^[A-Z0-9]$/.test(letter)) {
         handleLetterInput(letter);
+        playKeySound(); // Toca o som quando a tecla é pressionada
     }
 });
 
@@ -240,6 +245,14 @@ function completeRemainingLetters() {
         DOM.wordContainer.innerHTML = displayedLetters.join('');
     }
 }
+
+function playKeySound() {
+    const keySound = document.getElementById('key-sound');
+    keySound.currentTime = 0; // Reseta a reprodução do áudio
+    keySound.play();
+}
+
+
 
 
 getRandomItem();
