@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo da Forca</title>
-    <!-- Link do Bootstrap 4 (CDN) -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -16,36 +14,35 @@
         <h1 class="text-center my-4">Jogo da Forca</h1>
         
         <div class="form-group">
-    <label>Escolha uma categoria:</label><br>
-    <div>
-        <input type="radio" id="filmes" name="category" value="filmes" checked>
-        <label for="filmes">Filmes</label>
-    </div>
-    <div>
-        <input type="radio" id="series" name="category" value="series">
-        <label for="series">Séries</label>
-    </div>
-</div>
+            <label>Escolha uma categoria:</label><br>
+            <div>
+                <input type="radio" id="filmes" name="category" value="filmes" checked>
+                <label for="filmes">Filmes</label>
+            </div>
+            <div>
+                <input type="radio" id="series" name="category" value="series">
+                <label for="series">Séries</label>
+            </div>
+        </div>
 
-<!-- Contadores de vitórias e derrotas -->
-<div id="score-board" class="my-3">
-    <p>Vitórias: <span id="win-count">0</span></p>
-    <p>Derrotas: <span id="lose-count">0</span></p>
-</div>
-
+        <!-- Contadores de vitórias e derrotas -->
+        <div id="score-board" class="my-3">
+            <p>Vitórias: <span id="win-count">0</span></p>
+            <p>Derrotas: <span id="lose-count">0</span></p>
+        </div>
 
         <div class="game-info mb-3 row">
-    <!-- Imagem de Erros -->
-    <div id="error-image-box" class="col-md-6">
-        <img id="error-image" src="0erro.png" alt="Imagem de erros" class="img-fluid" />
-    </div>
+            <!-- Imagem de Erros -->
+            <div id="error-image-box" class="col-md-6">
+                <img id="error-image" src="0erro.png" alt="Imagem de erros" class="img-fluid" />
+            </div>
 
-    <!-- Informações do Filme -->
-    <div id="movie-info-box" class="col-md-6">
-        <img id="movie-cover" src="" alt="Capa do filme" class="img-fluid d-none" />
-        <p id="movie-approval" class="d-none"></p>
-    </div>
-</div>
+            <!-- Informações do Filme -->
+            <div id="movie-info-box" class="col-md-6">
+                <img id="movie-cover" src="" alt="Capa do filme" class="img-fluid d-none" />
+                <p id="movie-approval" class="d-none"></p>
+            </div>
+        </div>
 
         <p id="description">Adivinhe o nome!</p>
 
@@ -66,14 +63,19 @@
         <button id="reset-button" class="btn btn-danger mt-3">Recomeçar Jogo</button>
     </div>
 
+    <!-- Áudio que será tocado ao clicar ou pressionar uma tecla -->
+    <audio id="button-sound" src="https://www.soundjay.com/buttons/button-21.wav"></audio>
+  <audio id="error-sound" src="https://www.soundjay.com/buttons/beep-03.wav" preload="auto"></audio>
+<audio id="victory-sound" src="https://www.soundjay.com/human/applause-3.wav" preload="auto"></audio>
+  <audio id="lose-sound" src="https://www.soundjay.com/human/fart-squeak-01.wav" preload="auto"></audio>
+
+
+
     <script src="script.js"></script>
-    <!-- Script do Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<audio id="key-sound" src="https://freesound.org/data/previews/650/650880_9295402-lq.mp3"></audio>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-  
 </body>
-
 </html>
