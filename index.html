@@ -3,79 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo da Forca</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Jogo da Forca - Redesigned</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="text-center my-4">Jogo da Forca</h1>
-        
-        <div class="form-group">
-            <label>Escolha uma categoria:</label><br>
-            <div>
-                <input type="radio" id="filmes" name="category" value="filmes" checked>
-                <label for="filmes">Filmes</label>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1 class="game-title">
+                <i class="fas fa-gamepad"></i>
+                Jogo da Forca
+            </h1>
+            <div class="score-display">
+                <div class="score-item wins">
+                    <i class="fas fa-trophy"></i>
+                    <span>Vitórias</span>
+                    <span id="win-count" class="score-number">0</span>
+                </div>
+                <div class="score-item losses">
+                    <i class="fas fa-skull"></i>
+                    <span>Derrotas</span>
+                    <span id="lose-count" class="score-number">0</span>
+                </div>
             </div>
-            <div>
-                <input type="radio" id="series" name="category" value="series">
-                <label for="series">Séries</label>
-            </div>
-        </div>
+        </header>
 
-        <!-- Contadores de vitórias e derrotas -->
-        <div id="score-board" class="my-3">
-            <p>Vitórias: <span id="win-count">0</span></p>
-            <p>Derrotas: <span id="lose-count">0</span></p>
-        </div>
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Category Selection -->
+            <section class="category-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Escolha uma categoria
+                </h2>
+                <div class="category-options">
+                    <label class="category-option">
+                        <input type="radio" id="filmes" name="category" value="filmes" checked>
+                        <span class="category-card">
+                            <i class="fas fa-film"></i>
+                            <span>Filmes</span>
+                        </span>
+                    </label>
+                    <label class="category-option">
+                        <input type="radio" id="series" name="category" value="series">
+                        <span class="category-card">
+                            <i class="fas fa-tv"></i>
+                            <span>Séries</span>
+                        </span>
+                    </label>
+                </div>
+            </section>
 
-        <div class="game-info mb-3 row">
-            <!-- Imagem de Erros -->
-            <div id="error-image-box" class="col-md-6">
-                <img id="error-image" src="0erro.png" alt="Imagem de erros" class="img-fluid" />
-            </div>
+            <!-- Game Board -->
+            <section class="game-board">
+                <div class="game-visual">
+                    <!-- Hangman Image -->
+                    <div class="hangman-container">
+                        <img id="error-image" src="0erro.png" alt="Forca" class="hangman-image" />
+                        <div class="hangman-shadow"></div>
+                    </div>
 
-            <!-- Informações do Filme -->
-            <div id="movie-info-box" class="col-md-6">
-                <img id="movie-cover" src="" alt="Capa do filme" class="img-fluid d-none" />
-                <p id="movie-approval" class="d-none"></p>
-            </div>
-        </div>
+                    <!-- Movie Info -->
+                    <div id="movie-info-box" class="movie-info hidden">
+                        <div class="movie-poster">
+                            <img id="movie-cover" src="" alt="Capa do filme" />
+                        </div>
+                        <div class="movie-details">
+                            <p id="movie-approval" class="movie-rating"></p>
+                        </div>
+                    </div>
+                </div>
 
-        <p id="description">Adivinhe o nome!</p>
+                <!-- Word Display -->
+                <div class="word-section">
+                    <p class="word-hint">Adivinhe o nome!</p>
+                    <div id="word" class="word-display"></div>
+                </div>
 
-        <div id="forca-container" class="mb-3">
-            <div id="word" class="display-4"></div>
-        </div>
+                <!-- Wrong Letters -->
+                <div class="wrong-letters-section">
+                    <h3 class="wrong-letters-title">
+                        <i class="fas fa-times-circle"></i>
+                        Letras erradas
+                    </h3>
+                    <div id="wrong-letters-span" class="wrong-letters-display"></div>
+                </div>
+            </section>
 
-        <div id="wrong-letters" class="mb-3">
-            <p>Letras erradas:</p>
-            <span id="wrong-letters-span" class="font-weight-bold text-danger"></span>
-        </div>
+            <!-- Keyboard Section -->
+            <section class="keyboard-section">
+                <h3 class="keyboard-title">
+                    <i class="fas fa-keyboard"></i>
+                    Digite ou clique nas letras
+                </h3>
+                <div id="virtual-keyboard" class="virtual-keyboard"></div>
+            </section>
 
-        <div id="keyboard">
-            <p>Digite ou clique nas letras abaixo:</p>
-            <div id="virtual-keyboard" class="btn-group-vertical"></div>
-        </div>
+            <!-- Controls -->
+            <section class="controls-section">
+                <button id="reset-button" class="reset-button">
+                    <i class="fas fa-redo"></i>
+                    Novo Jogo
+                </button>
+            </section>
+        </main>
 
-        <button id="reset-button" class="btn btn-danger mt-3">Recomeçar Jogo</button>
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>Desenvolvido com <i class="fas fa-heart"></i> para diversão</p>
+        </footer>
     </div>
 
-    <!-- Áudio que será tocado ao clicar ou pressionar uma tecla -->
+    <!-- Audio Elements -->
     <audio id="button-sound" src="https://www.soundjay.com/buttons/button-21.wav"></audio>
-  <audio id="error-sound" src="https://www.soundjay.com/buttons/beep-03.wav" preload="auto"></audio>
-<audio id="victory-sound" src="https://www.soundjay.com/human/applause-3.wav" preload="auto"></audio>
-  <audio id="lose-sound" src="https://www.soundjay.com/human/fart-squeak-01.wav" preload="auto"></audio>
-
-
+    <audio id="error-sound" src="https://www.soundjay.com/buttons/beep-03.wav" preload="auto"></audio>
+    <audio id="victory-sound" src="https://www.soundjay.com/human/applause-3.wav" preload="auto"></audio>
+    <audio id="lose-sound" src="https://www.soundjay.com/human/fart-squeak-01.wav" preload="auto"></audio>
 
     <script src="script.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
 </body>
 </html>
